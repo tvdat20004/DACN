@@ -1,6 +1,4 @@
 *.tar.gz
-*.en
-*.de
 *.pyc
 *.pyo
 *.pkl
