@@ -1,5 +1,12 @@
 import base64
 import tenseal as ts
+try:
+    import cupy as np
+    is_cupy_available = True
+except:
+    import numpy as np
+    is_cupy_available = False
+
 def write_data(filename : str, data : bytes):
     with open(filename, 'wb') as file:
         file.write(base64.b64encode(data))
@@ -28,6 +35,7 @@ def _almost_equal(vec1, vec2, m_pow_ten : int = 1) -> bool:
         elif not _almost_equal_number(v1, v2, m_pow_ten):
             return False
     return True
-print('casodjiajdiasjdia')
 
 context = ts.context_from(read_data("../keys/public.txt"))
+def encrypt_matrix(matrix : np.ndarray) -> bytes:
+    return ts.ckks_tensor(context, matrix.tolist()).serialize()
