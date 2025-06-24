@@ -5,7 +5,7 @@ except:
     import numpy as np
     is_cupy_available = False
 
-from transformer_raw.layers.base.dropout import Dropout
+from transformer.layers.base.dropout import Dropout
 
 
 class PositionalEncoding():

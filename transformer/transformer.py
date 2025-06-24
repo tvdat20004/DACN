@@ -14,11 +14,11 @@ except:
 
 import pickle as pkl
 from tqdm import tqdm
-from transformer_raw.modules import Encoder
-from transformer_raw.modules import Decoder
-from transformer_raw.optimizers import Adam, Nadam, Momentum, RMSProp, SGD, Noam
-from transformer_raw.losses import CrossEntropy
-from transformer_raw.prepare_data import DataPreparator
+from transformer.modules import Encoder
+from transformer.modules import Decoder
+from transformer.optimizers import Adam, Nadam, Momentum, RMSProp, SGD, Noam
+from transformer.losses import CrossEntropy
+from transformer.prepare_data import DataPreparator
 import matplotlib.pyplot as plt
 
 

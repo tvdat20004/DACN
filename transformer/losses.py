@@ -5,7 +5,7 @@ except:
     import numpy as np
     is_cupy_available = False
 
-from transformer_raw.activations import Sigmoid, Softmax, ReLU, LogSoftmax
+from transformer.activations import Sigmoid, Softmax, ReLU, LogSoftmax
 
 
 class MSE():

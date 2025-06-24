@@ -5,10 +5,10 @@ except:
     import numpy as np
     is_cupy_available = False
 
-from transformer_raw.layers.base.embedding import Embedding
-from transformer_raw.layers.base.dropout import Dropout
-from transformer_raw.layers.combined.encoder_layer import EncoderLayer
-from transformer_raw.layers.combined.positional_encoding import PositionalEncoding
+from transformer.layers.base.embedding import Embedding
+from transformer.layers.base.dropout import Dropout
+from transformer.layers.combined.encoder_layer import EncoderLayer
+from transformer.layers.combined.positional_encoding import PositionalEncoding
 
 
 

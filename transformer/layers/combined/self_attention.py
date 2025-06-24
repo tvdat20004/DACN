@@ -5,9 +5,9 @@ except:
     import numpy as np
     is_cupy_available = False
 
-from transformer_raw.layers.base.dense import Dense
-from transformer_raw.layers.base.dropout import Dropout
-from transformer_raw.activations import Sigmoid, Softmax
+from transformer.layers.base.dense import Dense
+from transformer.layers.base.dropout import Dropout
+from transformer.activations import Sigmoid, Softmax
 
 
 class MultiHeadAttention:

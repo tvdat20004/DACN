@@ -1,7 +1,7 @@
-from transformer_raw.layers.base.dropout import Dropout
-from transformer_raw.layers.combined.self_attention import MultiHeadAttention
-from transformer_raw.layers.combined.positionwise_feed_forward import PositionwiseFeedforward
-from transformer_raw.layers.base.layer_norm import LayerNormalization
+from transformer.layers.base.dropout import Dropout
+from transformer.layers.combined.self_attention import MultiHeadAttention
+from transformer.layers.combined.positionwise_feed_forward import PositionwiseFeedforward
+from transformer.layers.base.layer_norm import LayerNormalization
 
 
 class EncoderLayer:

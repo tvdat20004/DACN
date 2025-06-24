@@ -1,6 +1,6 @@
-from transformer_raw.activations import ReLU
-from transformer_raw.layers.base.dense import Dense
-from transformer_raw.layers.base.dropout import Dropout
+from transformer.activations import ReLU
+from transformer.layers.base.dense import Dense
+from transformer.layers.base.dropout import Dropout
 
 class PositionwiseFeedforward():
     def __init__(self, d_model = 512, d_ff = 2048,  dropout = 0.1):
