@@ -22,7 +22,6 @@ from transformer.losses import CrossEntropy
 from transformer.prepare_data import DataPreparator
 import matplotlib.pyplot as plt
 from typing import List, Tuple, Dict, Optional
-# sys.path.append(r"../")
 from transformer import utils
 
 unsplited_mapping = Dict[str, str]

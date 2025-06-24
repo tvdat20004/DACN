@@ -12,8 +12,11 @@ def write_data(filename : str, data : bytes):
         file.write(base64.b64encode(data))
 
 def read_data(filename : str) -> bytes:
+    print("hahaha")
     with open(filename, 'rb') as file:
-        return base64.b64decode(file.read())
+        data = base64.b64decode(file.read())
+        print("hahahahha")
+    return data
 
 def _almost_equal_number(v1, v2, m_pow_ten : int = 1) -> bool:
     upper_bound = pow(10, -m_pow_ten)

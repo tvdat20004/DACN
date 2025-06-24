@@ -6,7 +6,7 @@ except:
     is_cupy_available = False
 from typing import Optional
 import tenseal as ts
-from transformer import encrypt
+from transformer import utils
 class Dense():
     """
     Add Dense layer
@@ -44,7 +44,8 @@ class Dense():
         #kaiming initialization
         # stdv = np.sqrt(2 / self.input_size)
         self.w = np.random.uniform(-stdv, stdv, (self.inputs_num, self.units_num)).astype(self.data_type)
-        self.w = encrypt.encrypt_matrix(self.w)
+        print(self.w.shape)
+        self.w = utils.encrypt_matrix(self.w)
         # if self.use_bias == True:
         #     self.b = np.random.uniform(-stdv, stdv, self.units_num)
         # else:

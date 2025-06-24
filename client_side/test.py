@@ -8,9 +8,8 @@ from dropout import Dropout
 from embedding import Embedding
 from positional_encoding import PositionalEncoding
 from prepare_data import DataPreparator
-from encrypt import encrypt_matrix
 import tenseal as ts
-import utils
+from client_side import utils
 
 # Get data
 DATA_TYPE = np.float32
@@ -74,7 +73,3 @@ src = dropout.forward(src, training = False)
 # Encrypt ?
 print(src.shape)
 print(len(src))
-# enc_src = encrypt_matrix(src)
-# context = ts.context_from(utils.read_data("../keys/public.txt"))
-# vec = ts.ckks_tensor_from(context, enc_src)
-# print(len(vec))
