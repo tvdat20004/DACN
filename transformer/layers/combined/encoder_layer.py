@@ -2,10 +2,17 @@ from transformer.layers.base.dropout import Dropout
 from transformer.layers.combined.self_attention import MultiHeadAttention
 from transformer.layers.combined.positionwise_feed_forward import PositionwiseFeedforward
 from transformer.layers.base.layer_norm import LayerNormalization
+import tenseal as ts
+try:
+    import cupy as np
+    is_cupy_available = True
+except:
+    import numpy as np
+    is_cupy_available = False
 
 
 class EncoderLayer:
-    def __init__(self, d_model, heads_num, d_ff, dropout, data_type):
+    def __init__(self, d_model : int, heads_num : int, d_ff : int, dropout : float, data_type : type):
         super(EncoderLayer, self).__init__()
 
         self.self_attention_norm = LayerNormalization(d_model, epsilon=1e-6, data_type=data_type)
@@ -15,8 +22,9 @@ class EncoderLayer:
 
         self.dropout = Dropout(dropout, data_type)
 
-    def forward(self, src, src_mask, training):
-        _src, _ = self.self_attention.forward(src, src, src, src_mask, training)
+    def forward(self, src : ts.CKKSTensor, src_mask : ts.CKKSTensor):
+        print(222222)
+        _src, _ = self.self_attention.forward(src, src, src, src_mask)
         src = self.self_attention_norm.forward(src + self.dropout.forward(_src, training))
 
         _src = self.position_wise_feed_forward.forward(src, training)

@@ -9,31 +9,32 @@ from transformer.layers.base.embedding import Embedding
 from transformer.layers.base.dropout import Dropout
 from transformer.layers.combined.encoder_layer import EncoderLayer
 from transformer.layers.combined.positional_encoding import PositionalEncoding
-
-
+from typing import List
+import tenseal as ts
 
 
 class Encoder:
-    def __init__(self, src_vocab_size, heads_num, layers_num, d_model, d_ff, dropout, max_length = 5000, data_type = np.float32):
+    def __init__(self, heads_num : int, layers_num : int, d_model : int, d_ff : int, dropout : float, max_length : int = 5000, data_type : type = np.float32):
 
-        self.token_embedding    = Embedding(src_vocab_size, d_model, data_type)
-        self.position_embedding = PositionalEncoding(max_length, d_model, dropout, data_type)
+        # self.token_embedding    = Embedding(src_vocab_size, d_model, data_type)
+        # self.position_embedding = PositionalEncoding(max_length, d_model, dropout, data_type)
 
-        self.layers = []
+        self.layers : List[EncoderLayer] = []
         for _ in range(layers_num):
             self.layers.append(EncoderLayer(d_model, heads_num, d_ff, dropout, data_type))
 
-        self.dropout = Dropout(dropout, data_type)
-        self.scale = np.sqrt(d_model).astype(data_type)
+        # self.dropout = Dropout(dropout, data_type)
+        # self.scale = np.sqrt(d_model).astype(data_type)
 
-    def forward(self, src, src_mask, training):
+    def forward(self, src : ts.CKKSTensor):
 
-        src = self.token_embedding.forward(src) * self.scale
-        src = self.position_embedding.forward(src)
-        src = self.dropout.forward(src, training)
-
+        # src = self.token_embedding.forward(src) * self.scale
+        # src = self.position_embedding.forward(src)
+        # src = self.dropout.forward(src, training)
+        # //////
+        print(1111111)
         for layer in self.layers:
-            src = layer.forward(src, src_mask, training)
+            src = layer.forward(src, None)
 
         return src
 

@@ -1,0 +1,6 @@
+{
+    "python.analysis.extraPaths": [
+        "./client_side",
+        "./transformer"
+    ]
+}

@@ -4,9 +4,9 @@ try:
 except:
     import numpy as np
     is_cupy_available = False
-
-
-
+from typing import Optional
+import tenseal as ts
+from transformer import encrypt
 class Dense():
     """
     Add Dense layer
@@ -18,12 +18,12 @@ class Dense():
             output: data with shape (batch_size, units_num)
     """
 
-    def __init__(self, units_num, inputs_num = None, use_bias = True, data_type = np.float32):
+    def __init__(self, units_num : int, inputs_num : Optional[int] = None, use_bias : bool = True, data_type : type = np.float32) -> None:
 
         self.units_num   = units_num
         self.inputs_num = inputs_num
         self.use_bias    = use_bias
-        
+
         self.w = None
         self.b = None
 
@@ -35,7 +35,7 @@ class Dense():
     def set_optimizer(self, optimizer):
         self.optimizer = optimizer
 
-    def build(self):
+    def build(self) -> None:
 
         # self.w = np.random.normal(0, pow(self.input_size, -0.5), (self.input_size, self.units_num))
         #xavier initialization
@@ -44,16 +44,17 @@ class Dense():
         #kaiming initialization
         # stdv = np.sqrt(2 / self.input_size)
         self.w = np.random.uniform(-stdv, stdv, (self.inputs_num, self.units_num)).astype(self.data_type)
+        self.w = encrypt.encrypt_matrix(self.w)
         # if self.use_bias == True:
         #     self.b = np.random.uniform(-stdv, stdv, self.units_num)
         # else:
         #     self.b = np.zeros(self.units_num)
         self.b = np.zeros(self.units_num).astype(self.data_type)
-        
+
 
         #glorot initialization
         # self.w = np.random.uniform(-np.sqrt(6 / (self.input_size + self.units_num)), np.sqrt(6 / (self.input_size + self.units_num)), (self.input_size, self.units_num))
-        
+
 
         self.v, self.m         = np.zeros_like(self.w).astype(self.data_type), np.zeros_like(self.w).astype(self.data_type) # optimizers params
         self.v_hat, self.m_hat = np.zeros_like(self.w).astype(self.data_type), np.zeros_like(self.w).astype(self.data_type) # optimizers params
@@ -63,13 +64,13 @@ class Dense():
 
         self.output_shape = (1, self.units_num)
 
-    def forward(self, X, training = True): 
+    def forward(self, X : ts.CKKSTensor) -> ts.CKKSTensor:
         self.input_data = X
-       
-        self.batch_size = len(self.input_data)
 
-        self.output_data = np.dot(self.input_data, self.w) + self.b
-        
+        self.batch_size = self.input_data.shape[0]
+        print(444444)
+        self.output_data = self.input_data * self.w + self.b
+        print(5555555)
         return self.output_data
 
     def backward(self, error):
@@ -84,7 +85,7 @@ class Dense():
         self.w, self.v, self.m, self.v_hat, self.m_hat  = self.optimizer.update(self.grad_w, self.w, self.v, self.m, self.v_hat, self.m_hat, layer_num)
         if self.use_bias == True:
             self.b, self.vb, self.mb, self.vb_hat, self.mb_hat  = self.optimizer.update(self.grad_b, self.b, self.vb, self.mb, self.vb_hat, self.mb_hat, layer_num)
-        
+
         return layer_num + 1
 
     def get_grads(self):
@@ -92,4 +93,3 @@ class Dense():
 
     def set_grads(self, grads):
         self.grad_w, self.grad_b = grads
-        

@@ -14,13 +14,19 @@ except:
 
 import pickle as pkl
 from tqdm import tqdm
+import tenseal as ts
 from transformer.modules import Encoder
 from transformer.modules import Decoder
 from transformer.optimizers import Adam, Nadam, Momentum, RMSProp, SGD, Noam
 from transformer.losses import CrossEntropy
 from transformer.prepare_data import DataPreparator
 import matplotlib.pyplot as plt
+from typing import List, Tuple, Dict, Optional
+# sys.path.append(r"../")
+from transformer import utils
 
+unsplited_mapping = Dict[str, str]
+splited_mapping = Dict[str, List[str]]
 
 
 DATA_TYPE = np.float32
@@ -35,20 +41,19 @@ PAD_INDEX = 0
 SOS_INDEX = 1
 EOS_INDEX = 2
 UNK_INDEX = 3
-dataset_path = '../dataset/'
 tokens  = (PAD_TOKEN, SOS_TOKEN, EOS_TOKEN, UNK_TOKEN)
 indexes = (PAD_INDEX, SOS_INDEX, EOS_INDEX, UNK_INDEX)
 
-data_preparator = DataPreparator(tokens, indexes)
+# data_preparator = DataPreparator(tokens, indexes)
 
-train_data, test_data, val_data = data_preparator.prepare_data(
-                    path = dataset_path,
-                    batch_size = BATCH_SIZE,
-                    min_freq = 2)
+# train_data, test_data, val_data = data_preparator.prepare_data(
+#                     path = dataset_path,
+#                     batch_size = BATCH_SIZE,
+#                     min_freq = 2)
 
-source, target = train_data
+# source, target = train_data
 
-train_data_vocabs = data_preparator.get_vocabs()
+# train_data_vocabs = data_preparator.get_vocabs()
 
 
 
@@ -66,12 +71,12 @@ class Seq2Seq():
         encoder.set_optimizer(self.optimizer)
         decoder.set_optimizer(self.optimizer)
 
-    def compile(self, optimizer, loss_function):
+    def compile(self, optimizer : Noam, loss_function : CrossEntropy) -> None:
         self.optimizer = optimizer
         self.loss_function = loss_function
 
 
-    def load(self, path):
+    def load(self, path : str) -> None:
         pickle_encoder = open(f'{path}/encoder.pkl', 'rb')
         pickle_decoder = open(f'{path}/decoder.pkl', 'rb')
         # print(type(self.encoder.dropout.scale))
@@ -83,7 +88,7 @@ class Seq2Seq():
 
         print(f'Loaded from "{path}"')
 
-    def save(self, path):
+    def save(self, path : str) -> None:
         if not os.path.exists(path):
             os.makedirs(path)
 
@@ -98,7 +103,7 @@ class Seq2Seq():
 
         print(f'Saved to "{path}"')
 
-    def get_pad_mask(self, x):
+    def get_pad_mask(self, x : np.ndarray) -> np.ndarray:
         #x: (batch_size, seq_len)
         return (x != self.pad_idx).astype(int)[:, np.newaxis, :]
 
@@ -228,42 +233,43 @@ class Seq2Seq():
         return train_loss_history, val_loss_history
 
 
+# def(predict(self, ckks_tensor, max_length)))
+
+    def predict(self,enc_tensor : ts.CKKSTensor, max_length : int = 50):
+
+        # src_inds = [vocabs[0][word] if word in vocabs[0] else UNK_INDEX for word in sentence]
+        # src_inds = [SOS_INDEX] + src_inds + [EOS_INDEX]
+
+        # src = np.asarray(src_inds).reshape(1, -1)
+        # src_mask =  self.get_pad_mask(src)
+        # print(src_mask, type(src_mask))
+
+        enc_src = self.encoder.forward(enc_tensor)
+
+        # trg_inds = [SOS_INDEX]
+
+        # for _ in range(max_length):
+        #     trg = np.asarray(trg_inds).reshape(1, -1)
+        #     trg_mask = self.get_pad_mask(trg) & self.get_sub_mask(trg)
+
+        #     out, attention = self.decoder.forward(trg, trg_mask, enc_src, src_mask, training = False)
+
+        #     trg_indx = out.argmax(axis=-1)[:, -1].item()
+        #     trg_inds.append(trg_indx)
+
+        #     if trg_indx == EOS_INDEX or len(trg_inds) >= max_length:
+        #         break
+
+        # reversed_vocab = dict((v,k) for k,v in vocabs[1].items())
+        # decoded_sentence = [reversed_vocab[indx] if indx in reversed_vocab else UNK_TOKEN for indx in trg_inds]
+
+        # return decoded_sentence[1:], attention[0]
 
 
-    def predict(self, sentence, vocabs, max_length = 50):
-
-        src_inds = [vocabs[0][word] if word in vocabs[0] else UNK_INDEX for word in sentence]
-        src_inds = [SOS_INDEX] + src_inds + [EOS_INDEX]
-
-        src = np.asarray(src_inds).reshape(1, -1)
-        src_mask =  self.get_pad_mask(src)
-
-        enc_src = self.encoder.forward(src, src_mask, training = False)
-
-        trg_inds = [SOS_INDEX]
-
-        for _ in range(max_length):
-            trg = np.asarray(trg_inds).reshape(1, -1)
-            trg_mask = self.get_pad_mask(trg) & self.get_sub_mask(trg)
-
-            out, attention = self.decoder.forward(trg, trg_mask, enc_src, src_mask, training = False)
-
-            trg_indx = out.argmax(axis=-1)[:, -1].item()
-            trg_inds.append(trg_indx)
-
-            if trg_indx == EOS_INDEX or len(trg_inds) >= max_length:
-                break
-
-        reversed_vocab = dict((v,k) for k,v in vocabs[1].items())
-        decoded_sentence = [reversed_vocab[indx] if indx in reversed_vocab else UNK_TOKEN for indx in trg_inds]
-
-        return decoded_sentence[1:], attention[0]
 
 
-
-
-INPUT_DIM = len(train_data_vocabs[0])
-OUTPUT_DIM = len(train_data_vocabs[1])
+# INPUT_DIM = len(train_data_vocabs[0])
+# OUTPUT_DIM = len(train_data_vocabs[1])
 HID_DIM = 256  #512 in original paper
 ENC_LAYERS = 3 #6 in original paper
 DEC_LAYERS = 3 #6 in original paper
@@ -276,15 +282,15 @@ DEC_DROPOUT = 0.1
 MAX_LEN = 5000
 
 
-encoder = Encoder(INPUT_DIM, ENC_HEADS, ENC_LAYERS, HID_DIM, FF_SIZE, ENC_DROPOUT, MAX_LEN, DATA_TYPE)
-decoder = Decoder(OUTPUT_DIM, DEC_HEADS, DEC_LAYERS, HID_DIM, FF_SIZE, DEC_DROPOUT, MAX_LEN, DATA_TYPE)
-
+encoder = Encoder(ENC_HEADS, ENC_LAYERS, HID_DIM, FF_SIZE, ENC_DROPOUT, MAX_LEN, DATA_TYPE)
+# decoder = Decoder(DEC_HEADS, DEC_LAYERS, HID_DIM, FF_SIZE, DEC_DROPOUT, MAX_LEN, DATA_TYPE)
+decoder = None
 
 
 model = Seq2Seq(encoder, decoder, PAD_INDEX)
 
 try:
-    model.load("saved models/seq2seq_model/10")
+    model.load("../saved models/seq2seq_model/10")
 except:
     print("Can't load saved model state")
 
@@ -301,70 +307,76 @@ train_loss_history, val_loss_history = None, None
 # train_loss_history, val_loss_history = model.fit(train_data, val_data, epochs = 30, save_every_epochs = 5, save_path = "saved models/seq2seq_model", validation_check = True)# "saved models/seq2seq_model"
 
 
-def plot_loss_history(train_loss_history, val_loss_history):
-    plt.plot(train_loss_history)
-    plt.plot(val_loss_history)
-    plt.title('Loss history')
-    plt.ylabel('Loss')
-    plt.xlabel('Epoch')
-    plt.legend(['train', 'val'], loc='upper left')
-    plt.show()
+# def plot_loss_history(train_loss_history, val_loss_history):
+#     plt.plot(train_loss_history)
+#     plt.plot(val_loss_history)
+#     plt.title('Loss history')
+#     plt.ylabel('Loss')
+#     plt.xlabel('Epoch')
+#     plt.legend(['train', 'val'], loc='upper left')
+#     plt.show()
 
-if train_loss_history is not None and val_loss_history is not None:
-    plot_loss_history(train_loss_history, val_loss_history)
+# if train_loss_history is not None and val_loss_history is not None:
+#     plot_loss_history(train_loss_history, val_loss_history)
+data_path = "../enc_data/enc_data"
+enc = utils.read_data(data_path)
+print(00000000)
+enc_tensor = ts.ckks_tensor_from(utils.context, enc)
+print('ccccccc')
+response = model.predict(enc_tensor)
 
 
 
-_, _, val_data = data_preparator.import_multi30k_dataset(path = dataset_path)
-val_data = data_preparator.clear_dataset(val_data)[0]
-sentences_num = 10
+# _, _, val_data = data_preparator.import_multi30k_dataset(path = dataset_path)
+# val_data = data_preparator.clear_dataset(val_data)[0]
+# sentences_num = 10
 
-random_indices = np.random.randint(0, len(val_data), sentences_num)
-sentences_selection = [val_data[i] for i in random_indices]
+# random_indices = np.random.randint(0, len(val_data), sentences_num)
+# sentences_selection : List[splited_mapping] = [val_data[i] for i in random_indices]
 
 #Translate sentences from validation set
-for i, example in enumerate(sentences_selection):
-    print(f"\nExample №{i + 1}")
-    print(f"Input sentence: { ' '.join(example['en'])}")
-    print(f"Decoded sentence: {' '.join(model.predict(example['en'], train_data_vocabs)[0])}")
-    print(f"Target sentence: {' '.join(example['de'])}")
+# for i, example in enumerate(sentences_selection):
+#     print(f"\nExample №{i + 1}")
+#     print(f"Input sentence: { ' '.join(example['en'])}")
+#     print(f"Decoded sentence: {' '.join(model.predict(example['en'], train_data_vocabs)[0])}")
+#     print(f"Target sentence: {' '.join(example['de'])}")
 
 
 
 
-def plot_attention(sentence, translation, attention, heads_num = 8, rows_num = 2, cols_num = 4):
+# def plot_attention(sentence, translation, attention, heads_num = 8, rows_num = 2, cols_num = 4):
 
-    assert rows_num * cols_num == heads_num
+#     assert rows_num * cols_num == heads_num
 
-    sentence = [SOS_TOKEN] + [word.lower() for word in sentence] + [EOS_TOKEN]
+#     sentence = [SOS_TOKEN] + [word.lower() for word in sentence] + [EOS_TOKEN]
 
-    fig = plt.figure(figsize = (15, 25))
+#     fig = plt.figure(figsize = (15, 25))
 
-    for h in range(heads_num):
+#     for h in range(heads_num):
 
-        ax = fig.add_subplot(rows_num, cols_num, h + 1)
-        ax.set_xlabel(f'Head {h + 1}')
+#         ax = fig.add_subplot(rows_num, cols_num, h + 1)
+#         ax.set_xlabel(f'Head {h + 1}')
 
-        if is_cupy_available:
-            ax.matshow(cp.asnumpy(attention[h]), cmap = 'inferno')
-        else:
-            ax.matshow(attention[h], cmap = 'inferno')
+#         if is_cupy_available:
+#             ax.matshow(cp.asnumpy(attention[h]), cmap = 'inferno')
+#         else:
+#             ax.matshow(attention[h], cmap = 'inferno')
 
-        ax.tick_params(labelsize = 7)
+#         ax.tick_params(labelsize = 7)
 
-        ax.set_xticks(range(len(sentence)))
-        ax.set_yticks(range(len(translation)))
+#         ax.set_xticks(range(len(sentence)))
+#         ax.set_yticks(range(len(translation)))
 
-        ax.set_xticklabels(sentence, rotation=90)
-        ax.set_yticklabels(translation)
+#         ax.set_xticklabels(sentence, rotation=90)
+#         ax.set_yticklabels(translation)
 
 
-    plt.show()
+#     plt.show()
 
 #Plot Attention
-sentence = sentences_selection[0]['en']#['a', 'trendy', 'girl', 'talking', 'on', 'her', 'cellphone', 'while', 'gliding', 'slowly', 'down', 'the', 'street']
-print(f"\nInput sentence: {sentence}")
-decoded_sentence, attention =  model.predict(sentence, train_data_vocabs)
-print(f"Decoded sentence: {decoded_sentence}")
+# sentence = sentences_selection[0]['en']#['a', 'trendy', 'girl', 'talking', 'on', 'her', 'cellphone', 'while', 'gliding', 'slowly', 'down', 'the', 'street']
+# print(f"\nInput sentence: {sentence}")
+# decoded_sentence, attention =  model.predict(sentence, train_data_vocabs)
+# print(f"Decoded sentence: {decoded_sentence}")
 
-plot_attention(sentence, decoded_sentence, attention)
+# plot_attention(sentence, decoded_sentence, attention)

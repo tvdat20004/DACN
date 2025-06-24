@@ -3,7 +3,7 @@ from pathlib import Path
 sys.path[0] = str(Path(sys.path[0]).parent)
 import pickle
 from transformer.prepare_data import DataPreparator
-
+from transformer.modules.encoder import Encoder
 import numpy as np
 try:
     import cupy as cp
@@ -35,3 +35,22 @@ train_data, test_data, val_data = data_preparator.prepare_data(
                     path = dataset_path,
                     batch_size = BATCH_SIZE,
                     min_freq = 2)
+source, target = train_data
+
+train_data_vocabs = data_preparator.get_vocabs()
+
+INPUT_DIM = len(train_data_vocabs[0])
+OUTPUT_DIM = len(train_data_vocabs[1])
+HID_DIM = 256  #512 in original paper
+ENC_LAYERS = 3 #6 in original paper
+DEC_LAYERS = 3 #6 in original paper
+ENC_HEADS = 8
+DEC_HEADS = 8
+FF_SIZE = 512  #2048 in original paper
+ENC_DROPOUT = 0.1
+DEC_DROPOUT = 0.1
+
+MAX_LEN = 5000
+
+
+encoder = Encoder(INPUT_DIM, ENC_HEADS, ENC_LAYERS, HID_DIM, FF_SIZE, ENC_DROPOUT, MAX_LEN, DATA_TYPE)

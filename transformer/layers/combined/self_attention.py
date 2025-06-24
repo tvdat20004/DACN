@@ -8,18 +8,19 @@ except:
 from transformer.layers.base.dense import Dense
 from transformer.layers.base.dropout import Dropout
 from transformer.activations import Sigmoid, Softmax
-
+from typing import Optional
+import tenseal as ts
 
 class MultiHeadAttention:
     """Multi-HeadAttention"""
-    def __init__(self, d_model = 512, heads_num = 8, dropout = 0.1, data_type = None):
+    def __init__(self, d_model : int = 512, heads_num : int = 8, dropout : float = 0.1, data_type : Optional[type] = None) -> None:
         self.d_model = d_model
         self.heads_num = heads_num
 
         self.data_type = data_type
 
         self.d_k, self.d_q, self.d_v = self.d_model // heads_num, self.d_model // heads_num, self.d_model // heads_num #512 / 8 = 64
-        self.scale = np.sqrt(self.d_k).astype(self.data_type)
+        self.scale = np.sqrt(self.d_k).astype(self.data_type) # np.float32
 
         self.K_linear = Dense(inputs_num = self.d_model, units_num = self.d_k * heads_num, use_bias = False, data_type = self.data_type) # self.W_K = np.random.randn(self.d_model, self.d_k)
         self.Q_linear = Dense(inputs_num = self.d_model, units_num = self.d_q * heads_num, use_bias = False, data_type = self.data_type) # self.W_Q = np.random.randn(self.d_model, self.d_q)
@@ -30,10 +31,10 @@ class MultiHeadAttention:
 
         self.dropout = Dropout(dropout)
 
-    def split_heads_forward(self, x):
+    def split_heads_forward(self, x : ts.CKKSTensor):
         batch_size = x.shape[0]
 
-        return x.reshape(batch_size, -1, self.heads_num, self.d_k).transpose(0, 2, 1, 3)
+        return x.reshape([batch_size, -1, self.heads_num, self.d_k]).transpose(0, 2, 1, 3)
 
     def split_heads_backward(self, x):
         batch_size = x.shape[0]
@@ -51,13 +52,14 @@ class MultiHeadAttention:
         return x.reshape(batch_size, -1, self.heads_num, self.d_k).transpose(0, 2, 1, 3)
 
 
-    def forward(self, query, key, value, mask, training = True):
+    def forward(self, query : ts.CKKSTensor, key : ts.CKKSTensor, value : ts.CKKSTensor, mask : ts.CKKSTensor):
 
         self.key_len, self.query_len, self.value_len = key.shape[1], query.shape[1], value.shape[1]
 
         #query = [batch size, query len, hid dim]
         #key = [batch size, key len, hid dim]
         #value = [batch size, value len, hid dim]
+        print(3333333)
 
         K = self.K_linear.forward(key)
         Q = self.Q_linear.forward(query)

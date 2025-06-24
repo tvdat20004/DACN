@@ -17,10 +17,10 @@ References:
 
 class Activation(object):
 
-    def forward(self, x):
+    def forward(self, x) -> None:
         pass
 
-    def backward(self, grad):
+    def backward(self, grad) -> None:
         pass
 
 
@@ -57,15 +57,15 @@ class Softmax(Activation):
     def forward(self, x):
         self.x = x
         e_x = np.exp(x - np.max(x, axis = self.axis, keepdims=True))
-        
+
         self.softmax =  e_x / np.sum(e_x, axis = self.axis, keepdims=True)
         return self.softmax
 
     # def backward(self, x, grad):# i=j
     #     f_x = self.forward(x)
-        
+
     #     return grad * f_x * (1.0 - f_x)
-   
+
 
     def backward(self, grad = None):
         #https://e2eml.school/softmax.html
@@ -76,7 +76,7 @@ class Softmax(Activation):
         softmax = self.forward(self.x)
         J = softmax[..., np.newaxis] * np.tile(np.identity(softmax.shape[-1], dtype = self.x.dtype), (softmax.shape[0], *tuple(np.ones(softmax.ndim, dtype = np.int8).tolist()))) - (softmax[..., np.newaxis, :].transpose(*tuple(np.arange(0, softmax.ndim - 1, 1, dtype=np.int8).tolist()), -1, -2) @ softmax[..., np.newaxis, :]) #np.matmul(softmax[:, :, None], softmax[:, None, :])
         input_grad =  grad[..., np.newaxis, :] @ J
-        
+
         return input_grad.reshape(self.x.shape) / batch_size
 
     # def backward_iter(self, grad = None): #iterative variant
@@ -101,13 +101,13 @@ class Softmax(Activation):
     #     return input_grad / batch_size
 
 
-    # @staticmethod    
+    # @staticmethod
     # @njit
     # def numba_backward(grad, softmax, input_grad):
 
     #     for k in range(grad.shape[0]): #4d
     #         for l in range(grad.shape[1]):
-    #             for i in range(grad.shape[3]): 
+    #             for i in range(grad.shape[3]):
     #                 sum_val = np.zeros(grad.shape[2], dtype=grad.dtype)
     #                 for j in range(grad.shape[3]):
     #                     sum_val += softmax[k, l, :, j] * grad[k, l, :, j] * -softmax[k, l, :, i]
@@ -130,7 +130,7 @@ class LogSoftmax(Activation):
 
     def softmax_forward(self, x):
         e_x = np.exp(x - np.max(x, axis = self.axis, keepdims=True))
-        
+
         self.softmax =  e_x / np.sum(e_x, axis = self.axis, keepdims=True)
         return self.softmax
 
@@ -141,7 +141,7 @@ class LogSoftmax(Activation):
 
     # def backward(self, x):# for i==j
     #     f_x = self.forward(x)
-        
+
     #     return (1.0 - f_x)
 
     # def jacobian_backward(self, grad = None):
@@ -151,7 +151,7 @@ class LogSoftmax(Activation):
     #     J = np.tile(np.identity(softmax.shape[-1], dtype = self.x.dtype), (softmax.shape[0], *np.ones(softmax.ndim, dtype = np.int8))) - (np.ones((*self.x.shape, 1)).astype(np.float32) @ softmax[..., np.newaxis, :])
 
     #     input_grad =  grad[..., np.newaxis, :] @ J
-        
+
     #     return input_grad.reshape(self.x.shape) / batch_size
 
     # def jacobian_backward(self, grad = None): #iterative variant
@@ -160,7 +160,7 @@ class LogSoftmax(Activation):
     #     softmax = self.softmax_forward(self.x)
 
     #     input_grad =  np.zeros(grad.shape, dtype=self.x.dtype)
-        
+
     #     # for i in range(grad.shape[1]): # for 1d array (1, D)
     #     #     input_grad[:, i] = grad[:, i] - softmax[:, i] * grad[0, :].sum()
 
@@ -175,7 +175,7 @@ class LogSoftmax(Activation):
 
     #     input_grad = self.numba_jacobian_backward(grad, softmax, input_grad) #(N, D)
     #     # input_grad = np.asarray(self.numba_jacobian_backward(np.asnumpy(grad), np.asnumpy(softmax), np.asnumpy(input_grad))) #(N, D)
-        
+
     #     return input_grad / batch_size
 
     # @staticmethod
@@ -225,7 +225,7 @@ class Swish(Activation):
 
     def forward(self, x):
         self.x = x
-        self.sigmoid = lambda z: 1 / (1 + np.exp(-z)) 
+        self.sigmoid = lambda z: 1 / (1 + np.exp(-z))
 
         return x * self.sigmoid(self.beta * x)
 
@@ -285,7 +285,7 @@ class LeakyReLU(Activation):
 class ELU(Activation):
 
     def __init__(self, alpha = 0.1):
-        self.alpha = alpha 
+        self.alpha = alpha
 
     def forward(self, x):
         self.x = x
@@ -300,7 +300,7 @@ class SELU(Activation):
 
     def __init__(self):
         self.alpha = 1.6732632423543772848170429916717
-        self.lmbda = 1.0507009873554804934193349852946 
+        self.lmbda = 1.0507009873554804934193349852946
 
     def forward(self, x):
         self.x = x
@@ -347,9 +347,9 @@ class Identity(Activation):
         x = self.x
         return np.asarray(grad * np.ones(x.shape).astype(x.dtype))
 
-    
+
 activations= {
-    
+
     "sigmoid": Sigmoid(),
     "tanh": Tanh(),
     "softmax": Softmax(),
@@ -364,5 +364,5 @@ activations= {
     "selu": SELU(),
     "gelu": GELU(),
     None: Identity()
-    
+
 }
