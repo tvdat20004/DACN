@@ -5,7 +5,7 @@ except:
     import numpy as np
     is_cupy_available = False
 
-from transformer.layers.base.dropout import Dropout
+from transformer_raw.layers.base.dropout import Dropout
 
 
 class PositionalEncoding():
@@ -20,7 +20,7 @@ class PositionalEncoding():
         self.max_len = max_len
 
         self.data_type = data_type
- 
+
         pe = np.zeros((max_len, d_model))  # (max_len, d_model)
         position = np.arange(0, max_len)[:, np.newaxis]# (max_len, 1)
         div_term = np.exp(np.arange(0, d_model, 2) * (-np.log(10000.0) / d_model))  # (d_model,)
@@ -46,4 +46,3 @@ class PositionalEncoding():
         """
 
         return error
-

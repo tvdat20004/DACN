@@ -4,11 +4,11 @@ try:
 except:
     import numpy as np
     is_cupy_available = False
-    
-from transformer.layers.base.embedding import Embedding
-from transformer.layers.base.dropout import Dropout
-from transformer.layers.combined.encoder_layer import EncoderLayer
-from transformer.layers.combined.positional_encoding import PositionalEncoding
+
+from transformer_raw.layers.base.embedding import Embedding
+from transformer_raw.layers.base.dropout import Dropout
+from transformer_raw.layers.combined.encoder_layer import EncoderLayer
+from transformer_raw.layers.combined.positional_encoding import PositionalEncoding
 
 
 
@@ -24,10 +24,10 @@ class Encoder:
             self.layers.append(EncoderLayer(d_model, heads_num, d_ff, dropout, data_type))
 
         self.dropout = Dropout(dropout, data_type)
-        self.scale = np.sqrt(d_model).astype(data_type) 
+        self.scale = np.sqrt(d_model).astype(data_type)
 
     def forward(self, src, src_mask, training):
-       
+
         src = self.token_embedding.forward(src) * self.scale
         src = self.position_embedding.forward(src)
         src = self.dropout.forward(src, training)
@@ -38,10 +38,10 @@ class Encoder:
         return src
 
     def backward(self, error):
-        
+
         for layer in reversed(self.layers):
             error = layer.backward(error)
-        
+
         error = self.dropout.backward(error)
         error = self.position_embedding.backward(error) * self.scale
         error = self.token_embedding.backward(error)
@@ -59,4 +59,3 @@ class Encoder:
 
         for layer in self.layers:
             layer_num = layer.update_weights(layer_num)
-

@@ -5,7 +5,7 @@ except:
     import numpy as np
     is_cupy_available = False
 
-from transformer.activations import Sigmoid, Softmax, ReLU, LogSoftmax
+from transformer_raw.activations import Sigmoid, Softmax, ReLU, LogSoftmax
 
 
 class MSE():
@@ -59,7 +59,7 @@ class CrossEntropy():
         t = np.asarray(t)
         log_softmax = self.log_softmax.forward(y)
         nll_loss = -log_softmax[np.arange(len(t)), t]
-        
+
         return np.where(t == self.ignore_index, 0, nll_loss)
 
     def derivative(self, y, t):
@@ -68,9 +68,9 @@ class CrossEntropy():
         batch_size = y.shape[0]
         err = 1/batch_size
         nll_loss_der = -1 * np.where(np.isin(y, y[np.arange(len(t)), t]), err, 0).astype(y.dtype)
-       
+
         output_err = self.log_softmax.backward(nll_loss_der)
-        
+
         return np.where(t.reshape(-1, 1) == self.ignore_index, 0, output_err)
 
 
@@ -84,7 +84,7 @@ class CrossEntropy():
 #             self.criterion = nn.CrossEntropyLoss(ignore_index=self.ignore_index)
 #         else:
 #             self.criterion = nn.CrossEntropyLoss()
-        
+
 
 #     def loss(self, y, t):
 #         y = torch.tensor(y, requires_grad=True)
@@ -108,14 +108,14 @@ class CrossEntropy():
 #             t # (batch_size * (target_seq_len - 1))
 #         )
 #         grad = torch.autograd.grad(self.torch_loss, y, retain_graph=True)
-        
+
 #         return grad[0].data.numpy()
 
 
 
 
 loss_functions = {
-    
+
     "mse": MSE(),
     "binary_crossentropy": BinaryCrossEntropy(),
     "categorical_crossentropy": CategoricalCrossEntropy()

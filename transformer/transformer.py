@@ -14,11 +14,11 @@ except:
 
 import pickle as pkl
 from tqdm import tqdm
-from transformer.modules import Encoder
-from transformer.modules import Decoder
-from transformer.optimizers import Adam, Nadam, Momentum, RMSProp, SGD, Noam
-from transformer.losses import CrossEntropy
-from transformer.prepare_data import DataPreparator
+from transformer_raw.modules import Encoder
+from transformer_raw.modules import Decoder
+from transformer_raw.optimizers import Adam, Nadam, Momentum, RMSProp, SGD, Noam
+from transformer_raw.losses import CrossEntropy
+from transformer_raw.prepare_data import DataPreparator
 import matplotlib.pyplot as plt
 
 
@@ -54,7 +54,7 @@ train_data_vocabs = data_preparator.get_vocabs()
 
 class Seq2Seq():
 
-    def __init__(self, encoder, decoder, pad_idx) -> None:
+    def __init__(self, encoder : Encoder, decoder : Decoder, pad_idx : int) -> None:
         self.encoder = encoder
         self.decoder = decoder
         self.pad_idx = pad_idx
@@ -196,7 +196,7 @@ class Seq2Seq():
 
         return epoch_loss.get() if is_cupy_available else epoch_loss
 
-
+    # Fit the model on the training data and evaluate on the validation data
     def fit(self, train_data, val_data, epochs, save_every_epochs, save_path = None, validation_check = False):
         self.set_optimizer()
 

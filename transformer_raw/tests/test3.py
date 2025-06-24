@@ -4,8 +4,8 @@ sys.path[0] = str(Path(sys.path[0]).parent)
 
 
 # import numpy as np
-from transformer.losses import MSE, BinaryCrossEntropy, CategoricalCrossEntropy, CrossEntropy
-from transformer.activations import Sigmoid, Softmax, ReLU, LogSoftmax
+from transformer_raw.losses import MSE, BinaryCrossEntropy, CategoricalCrossEntropy, CrossEntropy
+from transformer_raw.activations import Sigmoid, Softmax, ReLU, LogSoftmax
 # # class Softmax():
 
 # #     def forward(self, x):
@@ -33,20 +33,20 @@ from transformer.activations import Sigmoid, Softmax, ReLU, LogSoftmax
 
 # #     def function(self, x):
 # #         e_x = np.exp(x - np.max(x, axis = -1, keepdims=True))
-        
+
 # #         self.softmax =  e_x / np.sum(e_x, axis = -1, keepdims=True)
 # #         return self.softmax
 
 # #     def derivative(self, x):# x <- входные данные итак; i=j
 # #         f_x = self.function(x)
-        
+
 # #         return f_x * (1.0 - f_x)
 
 # #     def derivative2(self, x, grad = None): #неправильно отсносительно моей реализации/ х и есть инпут
 # #         #https://e2eml.school/softmax.html
 # #         softmax = self.function(x).reshape(1, -1)
 # #         # grad = grad.reshape(1, -1)
-# #         d_softmax = (softmax * np.identity(softmax.size)   #Jacobian matrix                      
+# #         d_softmax = (softmax * np.identity(softmax.size)   #Jacobian matrix
 # #                     - softmax.transpose() @ softmax)
 # #         #https://suzyahyah.github.io/calculus/machine%20learning/2018/04/04/Jacobian-and-Backpropagation.html
 # #         # input_grad = grad @ d_softmax
@@ -121,7 +121,7 @@ from transformer.activations import Sigmoid, Softmax, ReLU, LogSoftmax
 # # a = torch.tensor([1., 2., 3], requires_grad=True)# rand(3, requires_grad=True)
 # # print(a.shape)
 
-# # p = F.softmax(a, dim=0) #mb here dim = 1 while its 0 
+# # p = F.softmax(a, dim=0) #mb here dim = 1 while its 0
 # # # Specify dim dimensions for sfotmax operation
 
 # # print('softmax:', p)
@@ -142,7 +142,7 @@ from transformer.activations import Sigmoid, Softmax, ReLU, LogSoftmax
 # # # print(np.diagflat(input, axis = -1))
 # # softmax = activation.function(input).reshape(1, -1)
 # # # grad = grad.reshape(1, -1)
-# # d_softmax = (softmax * np.identity(softmax.size)   #Jacobian matrix                      
+# # d_softmax = (softmax * np.identity(softmax.size)   #Jacobian matrix
 # #             - softmax.transpose() @ softmax)
 
 # # # print("d_softmax\n", d_softmax)
@@ -232,5 +232,3 @@ print(y)
 print(y2)
 
 print(np.allclose(y, y2))
-
-

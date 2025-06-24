@@ -1,10 +1,10 @@
-from transformer.activations import ReLU
-from transformer.layers.base.dense import Dense
-from transformer.layers.base.dropout import Dropout
+from transformer_raw.activations import ReLU
+from transformer_raw.layers.base.dense import Dense
+from transformer_raw.layers.base.dropout import Dropout
 
 class PositionwiseFeedforward():
     def __init__(self, d_model = 512, d_ff = 2048,  dropout = 0.1):
-        
+
         self.fc_1 = Dense(inputs_num = d_model, units_num = d_ff)
         self.activation = ReLU()
         self.fc_2 = Dense(inputs_num = d_ff, units_num = d_model)
@@ -12,12 +12,12 @@ class PositionwiseFeedforward():
         self.dropout = Dropout(dropout)
 
     def forward(self, X, training = True):
-        
+
         X = self.fc_1.forward(X)
         X = self.activation.forward(X)
         X = self.dropout.forward(X, training)
         X = self.fc_2.forward(X)
-    
+
         return X
 
     def backward(self, error):

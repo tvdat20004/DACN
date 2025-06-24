@@ -3,10 +3,14 @@ from pathlib import Path
 sys.path[0] = str(Path(sys.path[0]).parent)
 
 import numpy as np
-from transformer.encrypt import context
+# from transformer.encrypt import context
+
+from typing import List, Tuple, Dict, Union
+unsplited_mapping = Dict[str, str]
+splited_mapping = Dict[str, List[str]]
 class DataPreparator():
 
-    def __init__(self, tokens, indexes):
+    def __init__(self, tokens : Tuple[str, ...], indexes : Tuple[int,...]) -> None:
 
         self.PAD_TOKEN = tokens[0]
         self.SOS_TOKEN = tokens[1]
@@ -21,7 +25,7 @@ class DataPreparator():
         self.toks_and_inds = {self.PAD_TOKEN: self.PAD_INDEX, self.SOS_TOKEN: self.SOS_INDEX, self.EOS_TOKEN: self.EOS_INDEX, self.UNK_TOKEN: self.UNK_INDEX}
         self.vocabs = None
 
-    def prepare_data(self, path = 'dataset/', batch_size = 1, min_freq = 10):
+    def prepare_data(self, path : str = 'dataset/', batch_size : int = 1, min_freq : int = 10):
 
         train_data, val_data, test_data = self.import_multi30k_dataset(path)
         train_data, val_data, test_data = self.clear_dataset(train_data, val_data, test_data)
@@ -40,22 +44,21 @@ class DataPreparator():
 
         val_data = self.add_tokens(val_data, batch_size)
         val_source, val_target = self.build_dataset(val_data, self.vocabs)
-
         return (train_source, train_target), (test_source, test_target), (val_source, val_target)
 
-    def get_vocabs(self):
+    def get_vocabs(self) -> Union[Tuple[Dict[str, int], ...], None]:
         return self.vocabs
 
-    def filter_seq(self, seq):
+    def filter_seq(self, seq:str) -> str:
         chars2remove = '!"#$%&()*+,-./:;<=>?@[\\]^_`{|}~\t\n'
 
         return ''.join([c for c in seq if c not in chars2remove])
 
-    def lowercase_seq(self, seq):
+    def lowercase_seq(self, seq : str) -> str:
         return seq.lower()
 
 
-    def import_multi30k_dataset(self, path):
+    def import_multi30k_dataset(self, path : str):
 
         ret = []
         filenames = ["train", "val", "test"]
@@ -83,7 +86,7 @@ class DataPreparator():
         return tuple(ret)
 
 
-    def clear_dataset(self, *data):
+    def clear_dataset(self, *data : List[unsplited_mapping]) -> Tuple[List[splited_mapping], ...]:
 
         for dataset in data:
             for example in dataset:
@@ -100,10 +103,10 @@ class DataPreparator():
 
 
 
-    def build_vocab(self, dataset, toks_and_inds, min_freq = 1):
-        en_vocab = toks_and_inds.copy(); en_vocab_freqs = {}
-        de_vocab = toks_and_inds.copy(); de_vocab_freqs = {}
+    def build_vocab(self, dataset : List[splited_mapping], toks_and_inds : Dict[str, int], min_freq : int = 1) -> Tuple[Dict[str, int],...]:
 
+        en_vocab = toks_and_inds.copy(); en_vocab_freqs : Dict[str, int] = {}
+        de_vocab = toks_and_inds.copy(); de_vocab_freqs : Dict[str, int] = {}
         for example in dataset:
             for word in example['en']:
                 if word not in en_vocab_freqs:
@@ -125,13 +128,12 @@ class DataPreparator():
         return en_vocab, de_vocab
 
 
-    def add_tokens(self, dataset, batch_size):
+    def add_tokens(self, dataset : List[splited_mapping], batch_size : int) -> List[List[splited_mapping]]:
         for example in dataset:
             example['en'] = [self.SOS_TOKEN] + example['en'] + [self.EOS_TOKEN]
             example['de'] = [self.SOS_TOKEN] + example['de'] + [self.EOS_TOKEN]
 
-        data_batches = np.array_split(dataset, np.arange(batch_size, len(dataset), batch_size))
-
+        data_batches : List[List[splited_mapping]] = np.array_split(dataset, np.arange(batch_size, len(dataset), batch_size))
         for batch in data_batches:
             max_en_seq_len, max_de_seq_len = 0, 0
 
@@ -147,7 +149,7 @@ class DataPreparator():
         return data_batches
 
 
-    def build_dataset(self, dataset, vocabs):
+    def build_dataset(self, dataset : List[List[splited_mapping]], vocabs : Tuple[Dict[str, int], ...])-> Tuple[List[np.ndarray], List[np.ndarray]]:
 
         source, target = [], []
         for batch in dataset:
@@ -156,7 +158,6 @@ class DataPreparator():
             for example in batch:
                 en_inds = [vocabs[0][word] if word in vocabs[0] else self.UNK_INDEX for word in example['en']]
                 de_inds = [vocabs[1][word] if word in vocabs[1] else self.UNK_INDEX for word in example['de']]
-
                 source_tokens.append(en_inds)
                 target_tokens.append(de_inds)
 

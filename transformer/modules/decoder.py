@@ -4,13 +4,13 @@ try:
 except:
     import numpy as np
     is_cupy_available = False
-    
-from transformer.layers.base.dense import Dense
-from transformer.layers.base.embedding import Embedding
-from transformer.layers.base.dropout import Dropout
-from transformer.layers.combined.decoder_layer import DecoderLayer
-from transformer.activations import Identity, Softmax
-from transformer.layers.combined.positional_encoding import PositionalEncoding
+
+from transformer_raw.layers.base.dense import Dense
+from transformer_raw.layers.base.embedding import Embedding
+from transformer_raw.layers.base.dropout import Dropout
+from transformer_raw.layers.combined.decoder_layer import DecoderLayer
+from transformer_raw.activations import Identity, Softmax
+from transformer_raw.layers.combined.positional_encoding import PositionalEncoding
 
 
 
@@ -33,16 +33,16 @@ class Decoder:
 
 
     def forward(self, trg, trg_mask, src, src_mask, training):
-        
+
         trg = self.token_embedding.forward(trg) * self.scale
         trg = self.position_embedding.forward(trg)
         trg = self.dropout.forward(trg, training)
-       
+
         for layer in self.layers:
             trg, attention = layer.forward(trg, trg_mask, src, src_mask, training)
-        
+
         output = self.fc_out.forward(trg)
-        
+
         activated_output = self.activation.forward(output)
 
 
@@ -50,9 +50,9 @@ class Decoder:
 
     def backward(self, error):
         error = self.activation.backward(error)
-        
+
         error = self.fc_out.backward(error)
-        
+
         self.encoder_error = 0
         for layer in reversed(self.layers):
             error, ecn_error = layer.backward(error)

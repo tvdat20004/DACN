@@ -5,9 +5,9 @@ except:
     import numpy as np
     is_cupy_available = False
 
-from transformer.layers.base.dense import Dense
-from transformer.layers.base.dropout import Dropout
-from transformer.activations import Sigmoid, Softmax
+from transformer_raw.layers.base.dense import Dense
+from transformer_raw.layers.base.dropout import Dropout
+from transformer_raw.activations import Sigmoid, Softmax
 
 
 class MultiHeadAttention:
@@ -20,7 +20,7 @@ class MultiHeadAttention:
 
         self.d_k, self.d_q, self.d_v = self.d_model // heads_num, self.d_model // heads_num, self.d_model // heads_num #512 / 8 = 64
         self.scale = np.sqrt(self.d_k).astype(self.data_type)
-        
+
         self.K_linear = Dense(inputs_num = self.d_model, units_num = self.d_k * heads_num, use_bias = False, data_type = self.data_type) # self.W_K = np.random.randn(self.d_model, self.d_k)
         self.Q_linear = Dense(inputs_num = self.d_model, units_num = self.d_q * heads_num, use_bias = False, data_type = self.data_type) # self.W_Q = np.random.randn(self.d_model, self.d_q)
         self.V_linear = Dense(inputs_num = self.d_model, units_num = self.d_v * heads_num, use_bias = False, data_type = self.data_type) # self.W_V = np.random.randn(self.d_model, self.d_v)
@@ -49,10 +49,10 @@ class MultiHeadAttention:
         batch_size = x.shape[0]
 
         return x.reshape(batch_size, -1, self.heads_num, self.d_k).transpose(0, 2, 1, 3)
-        
+
 
     def forward(self, query, key, value, mask, training = True):
-        
+
         self.key_len, self.query_len, self.value_len = key.shape[1], query.shape[1], value.shape[1]
 
         #query = [batch size, query len, hid dim]
@@ -76,7 +76,7 @@ class MultiHeadAttention:
         self.mask = np.asarray(mask)
         if self.mask is not None:
             self.mask = self.mask[:, np.newaxis, ...]
-            
+
             energy = np.where(self.mask == 0, float('-inf'), energy)#float("-1e20")
 
         attention = self.activation.forward(energy)
@@ -93,7 +93,7 @@ class MultiHeadAttention:
 
     def backward(self, error):
         error = self.O_linear.backward(error)
-        
+
         # error = error.reshape(error.shape[0], self.heads_num, self.query_len, self.d_v)
         error = self.group_heads_backward(error)
         V_error = np.matmul(self.dropout_attention.transpose(0, 1, 3, 2), error)
@@ -112,7 +112,7 @@ class MultiHeadAttention:
         K_error = np.matmul(self.Q.transpose(0, 1, 3, 2), error) #alter
         K_error = K_error.transpose(0, 1, 3, 2)
 
-        
+
         # V_error = V_error.reshape(V_error.shape[0], self.value_len, self.d_model)
         # Q_error = Q_error.reshape(Q_error.shape[0], self.query_len, self.d_model)
         # K_error = K_error.reshape(K_error.shape[0], self.key_len, self.d_model)
@@ -130,9 +130,9 @@ class MultiHeadAttention:
         return Q_error, K_error, V_error
 
 
-        
 
-        
+
+
 
     def set_optimizer(self, optimizer):
         self.K_linear.set_optimizer(optimizer)
@@ -147,8 +147,3 @@ class MultiHeadAttention:
         layer_num = self.O_linear.update_weights(layer_num)
 
         return layer_num
-
-
-        
-
-        

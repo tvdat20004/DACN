@@ -1,7 +1,7 @@
-from transformer.layers.base.dropout import Dropout
-from transformer.layers.combined.self_attention import MultiHeadAttention
-from transformer.layers.combined.positionwise_feed_forward import PositionwiseFeedforward
-from transformer.layers.base.layer_norm import LayerNormalization
+from transformer_raw.layers.base.dropout import Dropout
+from transformer_raw.layers.combined.self_attention import MultiHeadAttention
+from transformer_raw.layers.combined.positionwise_feed_forward import PositionwiseFeedforward
+from transformer_raw.layers.base.layer_norm import LayerNormalization
 
 class DecoderLayer():
     def __init__(self, d_model, heads_num, d_ff, dropout, data_type):
@@ -39,7 +39,7 @@ class DecoderLayer():
         error = self.self_attention_norm.backward(error + _error)
 
         _error, _error2, _error3 = self.self_attention.backward(self.dropout.backward(error))
-        
+
         return _error +_error2 + _error3 + error, enc_error1 + enc_error2
 
     def set_optimizer(self, optimizer):
@@ -59,4 +59,3 @@ class DecoderLayer():
         layer_num = self.position_wise_feed_forward.update_weights(layer_num)
 
         return layer_num
-

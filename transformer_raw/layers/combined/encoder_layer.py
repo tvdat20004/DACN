@@ -1,7 +1,7 @@
-from transformer.layers.base.dropout import Dropout
-from transformer.layers.combined.self_attention import MultiHeadAttention
-from transformer.layers.combined.positionwise_feed_forward import PositionwiseFeedforward
-from transformer.layers.base.layer_norm import LayerNormalization
+from transformer_raw.layers.base.dropout import Dropout
+from transformer_raw.layers.combined.self_attention import MultiHeadAttention
+from transformer_raw.layers.combined.positionwise_feed_forward import PositionwiseFeedforward
+from transformer_raw.layers.base.layer_norm import LayerNormalization
 
 
 class EncoderLayer:
@@ -18,7 +18,7 @@ class EncoderLayer:
     def forward(self, src, src_mask, training):
         _src, _ = self.self_attention.forward(src, src, src, src_mask, training)
         src = self.self_attention_norm.forward(src + self.dropout.forward(_src, training))
-        
+
         _src = self.position_wise_feed_forward.forward(src, training)
         src = self.ff_layer_norm.forward(src + self.dropout.forward(_src, training))
 
@@ -29,7 +29,7 @@ class EncoderLayer:
 
         _error = self.position_wise_feed_forward.backward(self.dropout.backward(error))
         error = self.self_attention_norm.backward(error + _error)
-        
+
         _error, _error2, _error3 = self.self_attention.backward(self.dropout.backward(error))
 
         return _error +_error2 +_error3 + error
