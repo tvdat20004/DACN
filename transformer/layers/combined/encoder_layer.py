@@ -23,7 +23,6 @@ class EncoderLayer:
         self.dropout = Dropout(dropout, data_type)
 
     def forward(self, src : ts.CKKSTensor, src_mask : ts.CKKSTensor):
-        print(222222)
         _src, _ = self.self_attention.forward(src, src, src, src_mask)
         src = self.self_attention_norm.forward(src + self.dropout.forward(_src, training))
 

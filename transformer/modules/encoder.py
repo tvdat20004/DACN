@@ -32,7 +32,6 @@ class Encoder:
         # src = self.position_embedding.forward(src)
         # src = self.dropout.forward(src, training)
         # //////
-        print(1111111)
         for layer in self.layers:
             src = layer.forward(src, None)
 

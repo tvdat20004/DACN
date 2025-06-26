@@ -3,7 +3,6 @@ from pathlib import Path
 sys.path[0] = str(Path(sys.path[0]).parent)
 
 import numpy as np
-from transformer_raw.encrypt import context
 class DataPreparator():
 
     def __init__(self, tokens, indexes):

@@ -8,7 +8,7 @@ from dropout import Dropout
 from embedding import Embedding
 from positional_encoding import PositionalEncoding
 from prepare_data import DataPreparator
-from client_side import utils
+from client_side.utils import Utils
 
 # Get data
 DATA_TYPE = np.float32
@@ -70,6 +70,7 @@ src = position_embedding.forward(src)
 src = dropout.forward(src, training = False)
 
 # Encrypt ?
-
-enc_src = utils.encrypt_matrix(src)
+print(src.shape)
+utils = Utils("../keys/")
+enc_src = Utils.encrypt_matrix(src)
 utils.write_data("../enc_data/enc_data", enc_src)
