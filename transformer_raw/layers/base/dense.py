@@ -1,10 +1,10 @@
-try:
-    import cupy as np
-    is_cupy_available = True
-except:
-    import numpy as np
-    is_cupy_available = False
-
+# try:
+#     import cupy as np
+#     is_cupy_available = True
+# except:
+#     import numpy as np
+#     is_cupy_available = False
+import numpy as np
 
 
 class Dense():
@@ -71,8 +71,7 @@ class Dense():
         self.batch_size = len(self.input_data)
 
         self.output_data = np.dot(self.input_data, self.w) + self.b
-        print(self.output_data.shape)
-        quit()
+
         return self.output_data
 
     def backward(self, error):

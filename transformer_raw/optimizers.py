@@ -1,15 +1,15 @@
 import numpy as np
-try: 
+try:
     import cupy as cp
     is_cupy_available = True
 except:
     is_cupy_available = False
-
+is_cupy_available = False
 from numba import njit
 
 
 class SGD():
-    
+
     def __init__(self, alpha = 0.001):
         self.alpha = alpha
 
@@ -34,11 +34,11 @@ class SGD():
 
         return weights, v, m, v_hat, m_hat
 
-    
+
 
 
 class Momentum():
-    
+
     def __init__(self, alpha = 0.01, beta = 0.9):
         self.alpha = alpha
         self.beta = beta
@@ -65,10 +65,10 @@ class Momentum():
         weights -= v * alpha
 
         return weights, v, m, v_hat, m_hat
-        
+
 
 class RMSProp():
-    
+
     def __init__(self, alpha = 0.01, beta = 0.9, epsilon = 0.000000001):
         self.alpha = alpha
         self.beta = beta
@@ -139,20 +139,20 @@ class Adam():
         return weights, v, m, v_hat, m_hat
 
 class Nadam():
-    
+
     def __init__(self, alpha = 0.001, beta = 0.9, beta2 = 0.999, epsilon = 0.000000001):
         self.alpha = alpha
         self.beta = beta
         self.beta2 = beta2
         self.epsilon = epsilon
-        
+
 
     def update(self, gradient, weights, v, m, v_hat, m_hat, t):
         if is_cupy_available:
             self._update = self._update_cupy
         else:
             self._update = self._update_numpy
-     
+
         return self._update(self.alpha, self.beta, self.beta2, self.epsilon, gradient, weights, v, m, v_hat, m_hat, t)
 
     @staticmethod
@@ -207,15 +207,15 @@ class Noam():
 
         self.optimizer.alpha = self.compute_learning_rate(self.scale_factor, self.model_dim, self.steps_num, self.warmup_steps)
         return self.optimizer.update(gradient, weights, v, m, v_hat, m_hat, t)
-    
+
 
 
 optimizers = {
-    
+
     "sgd": SGD(),
     "momentum": Momentum(),
     "rmsprop": RMSProp(),
     "adam": Adam(),
     "nadam": Nadam(),
-    
+
 }

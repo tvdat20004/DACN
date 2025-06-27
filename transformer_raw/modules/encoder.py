@@ -1,10 +1,10 @@
-try:
-    import cupy as np
-    is_cupy_available = True
-except:
-    import numpy as np
-    is_cupy_available = False
-
+# try:
+#     import cupy as np
+#     is_cupy_available = True
+# except:
+#     import numpy as np
+#     is_cupy_available = False
+import numpy as np
 from transformer_raw.layers.base.embedding import Embedding
 from transformer_raw.layers.base.dropout import Dropout
 from transformer_raw.layers.combined.encoder_layer import EncoderLayer

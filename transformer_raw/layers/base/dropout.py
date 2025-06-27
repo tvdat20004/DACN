@@ -1,11 +1,11 @@
-try:
-    import cupy as np
-    is_cupy_available = True
-except:
-    import numpy as np
-    is_cupy_available = False
+# try:
+#     import cupy as np
+#     is_cupy_available = True
+# except:
+#     import numpy as np
+#     is_cupy_available = False
 
-
+import numpy as np
 
 class Dropout():
     """
