@@ -4,7 +4,7 @@ try:
 except:
     import numpy as np
     is_cupy_available = False
-
+import tenseal as ts
 
 
 class Dropout():
@@ -25,18 +25,12 @@ class Dropout():
 
         self.data_type = data_type
 
-    def build(self):
-        self.output_shape = self.input_shape
+    # def build(self):
+    #     self.output_shape = self.input_shape
 
-    def forward(self, X, training = True):
+    def forward(self, X : ts.CKKSTensor) -> ts.CKKSTensor:
 
         self.mask = 1.0
-        if training: self.mask = np.random.binomial(
-                        n = 1,
-                        p = 1 - self.rate,
-                        size = X.shape,
-                    ).astype(self.data_type)
-
         return X * self.mask * self.scale
 
     def backward(self, error):

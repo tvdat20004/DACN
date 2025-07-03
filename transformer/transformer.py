@@ -236,33 +236,33 @@ class Seq2Seq():
 
     def predict(self,enc_tensor : ts.CKKSTensor, max_length : int = 50):
 
-        # src_inds = [vocabs[0][word] if word in vocabs[0] else UNK_INDEX for word in sentence]
-        # src_inds = [SOS_INDEX] + src_inds + [EOS_INDEX]
+        src_inds = [vocabs[0][word] if word in vocabs[0] else UNK_INDEX for word in sentence]
+        src_inds = [SOS_INDEX] + src_inds + [EOS_INDEX]
 
-        # src = np.asarray(src_inds).reshape(1, -1)
-        # src_mask =  self.get_pad_mask(src)
+        src = np.asarray(src_inds).reshape(1, -1)
+        src_mask =  self.get_pad_mask(src)
         # print(src_mask, type(src_mask))
 
         enc_src = self.encoder.forward(enc_tensor)
 
-        # trg_inds = [SOS_INDEX]
+        trg_inds = [SOS_INDEX]
 
-        # for _ in range(max_length):
-        #     trg = np.asarray(trg_inds).reshape(1, -1)
-        #     trg_mask = self.get_pad_mask(trg) & self.get_sub_mask(trg)
+        for _ in range(max_length):
+            trg = np.asarray(trg_inds).reshape(1, -1)
+            trg_mask = self.get_pad_mask(trg) & self.get_sub_mask(trg)
 
-        #     out, attention = self.decoder.forward(trg, trg_mask, enc_src, src_mask, training = False)
+            out, attention = self.decoder.forward(trg, trg_mask, enc_src, src_mask, training = False)
 
-        #     trg_indx = out.argmax(axis=-1)[:, -1].item()
-        #     trg_inds.append(trg_indx)
+            trg_indx = out.argmax(axis=-1)[:, -1].item()
+            trg_inds.append(trg_indx)
 
-        #     if trg_indx == EOS_INDEX or len(trg_inds) >= max_length:
-        #         break
+            if trg_indx == EOS_INDEX or len(trg_inds) >= max_length:
+                break
 
-        # reversed_vocab = dict((v,k) for k,v in vocabs[1].items())
-        # decoded_sentence = [reversed_vocab[indx] if indx in reversed_vocab else UNK_TOKEN for indx in trg_inds]
+        reversed_vocab = dict((v,k) for k,v in vocabs[1].items())
+        decoded_sentence = [reversed_vocab[indx] if indx in reversed_vocab else UNK_TOKEN for indx in trg_inds]
 
-        # return decoded_sentence[1:], attention[0]
+        return decoded_sentence[1:], attention[0]
 
 
 
@@ -282,7 +282,7 @@ MAX_LEN = 5000
 
 
 encoder = Encoder(ENC_HEADS, ENC_LAYERS, HID_DIM, FF_SIZE, ENC_DROPOUT, MAX_LEN, DATA_TYPE)
-# decoder = Decoder(DEC_HEADS, DEC_LAYERS, HID_DIM, FF_SIZE, DEC_DROPOUT, MAX_LEN, DATA_TYPE)
+decoder = Decoder(DEC_HEADS, DEC_LAYERS, HID_DIM, FF_SIZE, DEC_DROPOUT, MAX_LEN, DATA_TYPE)
 decoder = None
 
 

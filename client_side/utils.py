@@ -10,6 +10,7 @@ class Utils:
     def __init__(self, keys_folder_path : str):
         self.public_context = ts.context_from(Utils.read_data(f"{keys_folder_path}/public.txt"))
         self.secret_context = ts.context_from(Utils.read_data(f"{keys_folder_path}/secret.txt"))
+        self.secret_key = self.secret_context.secret_key()
     @staticmethod
     def write_data(filename : str, data : bytes):
         with open(filename, 'wb') as file:
@@ -23,7 +24,6 @@ class Utils:
     @staticmethod
     def _almost_equal_number(v1, v2, m_pow_ten : int = 1) -> bool:
         upper_bound = pow(10, -m_pow_ten)
-
         return abs(v1 - v2) <= upper_bound
 
     @staticmethod
@@ -44,4 +44,4 @@ class Utils:
     def encrypt_matrix(self, matrix : np.ndarray) -> ts.CKKSTensor:
         return ts.ckks_tensor(self.public_context, matrix.tolist())
     def decrypt_matrix(self, encrypted_matrix : ts.CKKSTensor) -> np.ndarray:
-        return np.array(encrypted_matrix.decrypt(self.secret_context)).astype(np.float32)
+        return np.array(encrypted_matrix.decrypt(self.secret_key).tolist(), dtype=np.float32)

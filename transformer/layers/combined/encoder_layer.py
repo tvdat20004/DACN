@@ -24,10 +24,10 @@ class EncoderLayer:
 
     def forward(self, src : ts.CKKSTensor, src_mask : ts.CKKSTensor):
         _src, _ = self.self_attention.forward(src, src, src, src_mask)
-        src = self.self_attention_norm.forward(src + self.dropout.forward(_src, training))
+        src = self.self_attention_norm.forward(src + self.dropout.forward(_src))
 
-        _src = self.position_wise_feed_forward.forward(src, training)
-        src = self.ff_layer_norm.forward(src + self.dropout.forward(_src, training))
+        _src = self.position_wise_feed_forward.forward(src)
+        src = self.ff_layer_norm.forward(src + self.dropout.forward(_src))
 
         return src
 
@@ -41,11 +41,11 @@ class EncoderLayer:
 
         return _error +_error2 +_error3 + error
 
-    def set_optimizer(self, optimizer):
-        self.self_attention_norm.set_optimizer(optimizer)
-        self.ff_layer_norm.set_optimizer(optimizer)
-        self.self_attention.set_optimizer(optimizer)
-        self.position_wise_feed_forward.set_optimizer(optimizer)
+    # def set_optimizer(self, optimizer):
+    #     self.self_attention_norm.set_optimizer(optimizer)
+    #     self.ff_layer_norm.set_optimizer(optimizer)
+    #     self.self_attention.set_optimizer(optimizer)
+    #     self.position_wise_feed_forward.set_optimizer(optimizer)
 
     def update_weights(self, layer_num):
         layer_num = self.self_attention_norm.update_weights(layer_num)

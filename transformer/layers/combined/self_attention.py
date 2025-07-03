@@ -59,7 +59,6 @@ class MultiHeadAttention:
         #query = [batch size, query len, hid dim]
         #key = [batch size, key len, hid dim]
         #value = [batch size, value len, hid dim]
-        print(3333333)
 
         K = self.K_linear.forward(key)
         Q = self.Q_linear.forward(query)

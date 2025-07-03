@@ -4,8 +4,10 @@ try:
 except:
     import numpy as np
     is_cupy_available = False
-from typing import Optional
-
+from typing import Optional, List
+import tenseal as ts
+def ndim(X : ts.CKKSTensor) -> int:
+    return len(X.shape)
 
 class LayerNormalization():
     """
@@ -34,39 +36,39 @@ class LayerNormalization():
         self.data_type = data_type
 
         self.axis = None
+        self.feature_size = None
+        # self.build()
 
-        self.build()
-    def 
     # def set_optimizer(self, optimizer):
     #     self.optimizer = optimizer
+    def set_encrypted_weights(self, enc_weights : List[ts.CKKSTensor]) -> None:
+        self.mean, self.var, self.gamma,
+
+    # def build(self) -> None:
+
+    #     if self.normalized_shape is not None:
+    #         self.gamma = np.ones(self.normalized_shape).astype(self.data_type)
+    #         self.beta = np.zeros(self.normalized_shape).astype(self.data_type)
 
 
-    def build(self) -> None:
-        self.feature_size = None
+    #         self.vg, self.mg         = np.zeros_like(self.gamma).astype(self.data_type), np.zeros_like(self.gamma).astype(self.data_type)
+    #         self.vg_hat, self.mg_hat = np.zeros_like(self.gamma).astype(self.data_type), np.zeros_like(self.gamma).astype(self.data_type)
 
-        if self.normalized_shape is not None:
-            self.gamma = np.ones(self.normalized_shape).astype(self.data_type)
-            self.beta = np.zeros(self.normalized_shape).astype(self.data_type)
-
-
-            self.vg, self.mg         = np.zeros_like(self.gamma).astype(self.data_type), np.zeros_like(self.gamma).astype(self.data_type)
-            self.vg_hat, self.mg_hat = np.zeros_like(self.gamma).astype(self.data_type), np.zeros_like(self.gamma).astype(self.data_type)
-
-            self.vb, self.mb         = np.zeros_like(self.gamma).astype(self.data_type), np.zeros_like(self.gamma).astype(self.data_type)
-            self.vb_hat, self.mb_hat = np.zeros_like(self.gamma).astype(self.data_type), np.zeros_like(self.gamma).astype(self.data_type)
+    #         self.vb, self.mb         = np.zeros_like(self.gamma).astype(self.data_type), np.zeros_like(self.gamma).astype(self.data_type)
+    #         self.vb_hat, self.mb_hat = np.zeros_like(self.gamma).astype(self.data_type), np.zeros_like(self.gamma).astype(self.data_type)
 
 
 
-    def forward(self, X):
+    def forward(self, X : ts.CKKSTensor):
         self.input_data = X
-        x_T = self.input_data.T
+        x_T = self.input_data.transpose()
 
-        if self.normalized_shape is None:
-            self.normalized_shape = self.input_data.shape[1:]
+        # if self.normalized_shape is None:
+        #     self.normalized_shape = self.input_data.shape[1:]
 
-            self.build()
+        #     self.build()
 
-        self.normalized_axis = tuple(np.arange(self.input_data.ndim - self.gamma.ndim).tolist())
+        self.normalized_axis = tuple(np.arange(ndim(self.input_data) - ndim(self.gamma)).tolist())
         self.feature_size = self.gamma.size
 
         self.mean = np.mean(x_T, axis = 0)

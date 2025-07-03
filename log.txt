@@ -1,1 +1,16 @@
+Loaded encoder and decoder from ./saved_models/seq2seq_model/10
 Keys generated and saved to ./keys/secret.txt and ./keys/public.txt
+Complete encryption
+0.2612607479095459
+Result: [[ True  True  True  True  True  True  True  True  True  True  True  True]
+ [ True  True  True  True  True  True  True  True  True  True  True  True]
+ [ True  True  True  True  True  True  True  True  True  True  True  True]
+ [ True  True  True  True  True  True  True  True  True  True  True  True]
+ [ True  True  True  True  True  True  True  True  True  True  True  True]
+ [ True  True  True  True  True  True  True  True  True  True  True  True]
+ [ True  True  True  True  True  True  True  True  True  True  True  True]
+ [ True  True  True  True  True  True  True  True  True  True  True  True]
+ [ True  True  True  True  True  True  True  True  True  True  True  True]
+ [ True  True  True  True  True  True  True  True  True  True  True  True]
+ [ True  True  True  True  True  True  True  True  True  True  True  True]]
+1.464562177658081
