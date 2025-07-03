@@ -41,5 +41,7 @@ class Utils:
             elif not Utils._almost_equal_number(v1, v2, m_pow_ten):
                 return False
         return True
-    def encrypt_matrix(self, matrix : np.ndarray) -> bytes:
+    def encrypt_matrix(self, matrix : np.ndarray) -> ts.CKKSTensor:
         return ts.ckks_tensor(self.public_context, matrix.tolist())
+    def decrypt_matrix(self, encrypted_matrix : ts.CKKSTensor) -> np.ndarray:
+        return np.array(encrypted_matrix.decrypt(self.secret_context)).astype(np.float32)

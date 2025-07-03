@@ -1,10 +1,10 @@
-# try:
-#     import cupy as np
-#     is_cupy_available = True
-# except:
-#     import numpy as np
-#     is_cupy_available = False
-import numpy as np
+try:
+    import cupy as np
+    is_cupy_available = True
+except:
+    import numpy as np
+    is_cupy_available = False
+# import numpy as np
 
 
 class LayerNormalization():
@@ -37,9 +37,11 @@ class LayerNormalization():
 
         self.build()
 
-    def set_optimizer(self, optimizer):
-        self.optimizer = optimizer
-
+    # def set_optimizer(self, optimizer):
+    #     self.optimizer = optimizer
+    def set_encrypted_weights(self, enc_weights):
+        assert len(enc_weights) == 4
+        self.gamma, self.beta, self.vg, self.mg, self.vg_hat, self.mg_hat, self.vb, self.mb, self.vb_hat, self.mb_hat = enc_weights
 
     def build(self):
         self.feature_size = None

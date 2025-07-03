@@ -7,7 +7,7 @@ from transformer_raw.layers.base.layer_norm import LayerNormalization
 class EncoderLayer:
     def __init__(self, d_model, heads_num, d_ff, dropout, data_type):
         super(EncoderLayer, self).__init__()
-
+        
         self.self_attention_norm = LayerNormalization(d_model, epsilon=1e-6, data_type=data_type)
         self.ff_layer_norm       = LayerNormalization(d_model, epsilon=1e-6, data_type=data_type)
         self.self_attention = MultiHeadAttention(d_model, heads_num, dropout, data_type)

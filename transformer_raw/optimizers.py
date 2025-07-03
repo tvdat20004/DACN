@@ -4,7 +4,7 @@ try:
     is_cupy_available = True
 except:
     is_cupy_available = False
-is_cupy_available = False
+# is_cupy_available = False
 from numba import njit
 
 

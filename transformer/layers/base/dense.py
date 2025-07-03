@@ -18,25 +18,15 @@ class Dense():
             output: data with shape (batch_size, units_num)
     """
 
-    def __init__(self, encrypted_weight : List[ts.CKKSTensor], units_num : int, inputs_num : Optional[int] = None, use_bias : bool = True, data_type : type = np.float32) -> None:
-
-        # self.units_num   = units_num
-        # self.inputs_num = inputs_num
-        # self.use_bias    = use_bias
+    def __init__(self, encrypted_weight : List[ts.CKKSTensor]) -> None:
 
         self.w = None
         self.b = None
-
-        # self.optimizer = None
-        # self.data_type = data_type
         self.set_encrypted_weights(encrypted_weight)
-        # self.build()
 
-    # def set_optimizer(self, optimizer):
-    #     self.optimizer = optimizer
-
-    def set_encrypted_weights(self, weights : List[ts.CKKSTensor]) -> None:
-        self.w, self.b, self.grad_b, self.grad_w= weights
+    def set_encrypted_weights(self, enc_weights : List[ts.CKKSTensor]) -> None:
+        assert len(enc_weights) == 4
+        self.w, self.b, self.grad_b, self.grad_w = enc_weights
 
     # def build(self) -> None:
 
@@ -59,6 +49,7 @@ class Dense():
         self.input_data = X
 
         self.batch_size = self.input_data.shape[0]
+        print(self.input_data.shape)
         self.output_data = self.input_data * self.w + self.b
         return self.output_data
 
@@ -70,12 +61,12 @@ class Dense():
 
         return output_error
 
-    def update_weights(self, layer_num):
-        self.w, self.v, self.m, self.v_hat, self.m_hat  = self.optimizer.update(self.grad_w, self.w, self.v, self.m, self.v_hat, self.m_hat, layer_num)
-        if self.use_bias == True:
-            self.b, self.vb, self.mb, self.vb_hat, self.mb_hat  = self.optimizer.update(self.grad_b, self.b, self.vb, self.mb, self.vb_hat, self.mb_hat, layer_num)
+    # def update_weights(self, layer_num):
+    #     self.w, self.v, self.m, self.v_hat, self.m_hat  = self.optimizer.update(self.grad_w, self.w, self.v, self.m, self.v_hat, self.m_hat, layer_num)
+    #     if self.use_bias == True:
+    #         self.b, self.vb, self.mb, self.vb_hat, self.mb_hat  = self.optimizer.update(self.grad_b, self.b, self.vb, self.mb, self.vb_hat, self.mb_hat, layer_num)
 
-        return layer_num + 1
+    #     return layer_num + 1
 
     # def get_grads(self):
     #     return self.grad_w, self.grad_b
