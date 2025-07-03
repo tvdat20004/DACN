@@ -1,0 +1,1 @@
+Keys generated and saved to ./keys/secret.txt and ./keys/public.txt
