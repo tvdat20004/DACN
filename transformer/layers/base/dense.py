@@ -6,7 +6,7 @@ except:
     is_cupy_available = False
 from typing import Optional, List
 import tenseal as ts
-from transformer import utils
+from transformer.utils import Utils, Union
 
 class Dense():
     """
@@ -46,12 +46,12 @@ class Dense():
 
     #     self.output_shape = (1, self.units_num)
 
-    def forward(self, X : ts.CKKSTensor) -> ts.CKKSTensor:
+    def forward(self, X : ts.CKKSTensor) -> Union[ts.CKKSTensor, List[ts.CKKSTensor]]:
         self.input_data = X
 
         self.batch_size = self.input_data.shape[0]
         # print(self.input_data.shape)
-        self.output_data = self.input_data.dot(self.w) + self.b
+        self.output_data = Utils.dot(self.input_data, self.w) + self.b
         return self.output_data
 
     def backward(self, error):
