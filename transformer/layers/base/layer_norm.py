@@ -6,8 +6,7 @@ except:
     is_cupy_available = False
 from typing import Optional, List
 import tenseal as ts
-def ndim(X : ts.CKKSTensor) -> int:
-    return len(X.shape)
+
 
 class LayerNormalization():
     """
