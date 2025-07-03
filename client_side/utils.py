@@ -15,10 +15,20 @@ class Utils:
     @staticmethod
     def ndim(X : ts.CKKSTensor) -> int:
         return len(X.shape)
-
+    @staticmethod
+    def add(tensor1: Union[ts.CKKSTensor, List[ts.CKKSTensor]], tensor2: ts.CKKSTensor) -> ts.CKKSTensor:
+        if isinstance(tensor1, list):
+            return [tensor1[i] + tensor2 for i in range(len(tensor1))]
+        elif isinstance(tensor1, ts.CKKSTensor):
+            if Utils.ndim(tensor1) == 3 and Utils.ndim(tensor2) == 2:
+                return [tensor1[i].reshape(tensor1.shape[1:]) + tensor2 for i in range(tensor1.shape[0])]
+        else:
+            return tensor1 + tensor2
     @staticmethod
     def _dot_2d(tensor1: ts.CKKSTensor, tensor2: ts.CKKSTensor) -> ts.CKKSTensor:
         return tensor1.dot(tensor2)
+
+    @staticmethod
     def _dot_3d_2d(tensor_3d: ts.CKKSTensor, tensor_2d: ts.CKKSTensor) -> List[ts.CKKSTensor]:
 
         if tensor_3d.shape[2] != tensor_2d.shape[0]:
@@ -28,11 +38,12 @@ class Utils:
         result_slices = []
         num_slices = tensor_3d.shape[0]
         for i in range(num_slices):
-            slice_2d = tensor_3d[i]
+            slice_2d = tensor_3d[i].reshape(list(tensor_3d.shape[1:]))
+            # print(f"Slice {i} shape: {slice_2d.shape}, Tensor 2D shape: {tensor_2d.shape}")
             result_slice = Utils._dot_2d(slice_2d, tensor_2d)
             result_slices.append(result_slice)
         return result_slices
-
+    @staticmethod
     def dot(tensor1: ts.CKKSTensor, tensor2: ts.CKKSTensor) -> Union[ts.CKKSTensor, List[ts.CKKSTensor]]:
         """
         Simulate the dot product operation between two CKKSTensors,
