@@ -16,7 +16,7 @@ class Utils:
     def ndim(X : ts.CKKSTensor) -> int:
         return len(X.shape)
     @staticmethod
-    def add(tensor1: Union[ts.CKKSTensor, List[ts.CKKSTensor]], tensor2: ts.CKKSTensor) -> ts.CKKSTensor:
+    def add(tensor1: Union[ts.CKKSTensor, List[ts.CKKSTensor]], tensor2: ts.CKKSTensor) -> Union[List[ts.CKKSTensor], ts.CKKSTensor]:
         if isinstance(tensor1, list):
             return [tensor1[i] + tensor2 for i in range(len(tensor1))]
         elif isinstance(tensor1, ts.CKKSTensor):
@@ -55,7 +55,8 @@ class Utils:
             return Utils._dot_3d_2d(tensor1, tensor2)
         else:
             return Utils._dot_2d(tensor1, tensor2)
-
+    @staticmethod
+    def mean(X : ts.CKKSTensor, )
     @staticmethod
     def write_data(filename : str, data : bytes):
         with open(filename, 'wb') as file:

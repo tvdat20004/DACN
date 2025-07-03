@@ -51,7 +51,7 @@ class Dense():
 
         self.batch_size = self.input_data.shape[0]
         # print(self.input_data.shape)
-        self.output_data = Utils.dot(self.input_data, self.w) + self.b
+        self.output_data = Utils.add(Utils.dot(self.input_data, self.w),self.b)
         return self.output_data
 
     def backward(self, error):
