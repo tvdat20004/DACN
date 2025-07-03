@@ -22,7 +22,7 @@ def write_data(filename : str, data : bytes):
         file.write(base64.b64encode(data))
 
 if __name__ == "__main__":
-    cxt = parallel_context(128)
+    cxt = parallel_context(12)
     secret = cxt.serialize(save_secret_key=True)
     write_data("./keys/secret.txt", secret)
     cxt.make_context_public()

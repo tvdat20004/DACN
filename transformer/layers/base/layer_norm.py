@@ -6,7 +6,7 @@ except:
     is_cupy_available = False
 from typing import Optional, List
 import tenseal as ts
-
+from client_side.utils import Utils
 
 class LayerNormalization():
     """
@@ -41,7 +41,7 @@ class LayerNormalization():
     # def set_optimizer(self, optimizer):
     #     self.optimizer = optimizer
     def set_encrypted_weights(self, enc_weights : List[ts.CKKSTensor]) -> None:
-        self.mean, self.var, self.gamma,
+        self.var, self.gamma,
 
     # def build(self) -> None:
 
@@ -67,7 +67,7 @@ class LayerNormalization():
 
         #     self.build()
 
-        self.normalized_axis = tuple(np.arange(ndim(self.input_data) - ndim(self.gamma)).tolist())
+        self.normalized_axis = tuple(np.arange(Utils.ndim(self.input_data) - Utils.ndim(self.gamma)).tolist())
         self.feature_size = self.gamma.size
 
         self.mean = np.mean(x_T, axis = 0)

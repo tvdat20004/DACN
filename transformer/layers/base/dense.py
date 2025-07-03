@@ -7,6 +7,7 @@ except:
 from typing import Optional, List
 import tenseal as ts
 from transformer import utils
+
 class Dense():
     """
     Add Dense layer
