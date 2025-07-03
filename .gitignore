@@ -2,8 +2,10 @@
 *.pyc
 *.pyo
 *.pkl
-*saved models/*
-!saved models/seq2seq_model/
+*saved_models_bak/*
+!saved_models_bak/seq2seq_model/
+*saved_models/*
+!saved_models/seq2seq_model/
 .mypy_cache/
 __pycache__/
 keys/

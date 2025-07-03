@@ -4,11 +4,11 @@ try:
 except:
     import numpy as np
     is_cupy_available = False
+from utils import Utils
 from dropout import Dropout
 from embedding import Embedding
 from positional_encoding import PositionalEncoding
 from prepare_data import DataPreparator
-from client_side import utils
 
 # Get data
 DATA_TYPE = np.float32
@@ -67,9 +67,7 @@ src_inds = [SOS_INDEX] + src_inds + [EOS_INDEX]
 src = np.asarray(src_inds).reshape(1, -1)
 src = token_embedding.forward(src) * scale
 src = position_embedding.forward(src)
-src = dropout.forward(src, training = False)
-
-# Encrypt ?
-
-enc_src = utils.encrypt_matrix(src)
-utils.write_data("../enc_data/enc_data", enc_src)
+src = dropout.forward(src, training = False)[0]
+utils = Utils("../keys")
+enc = utils.encrypt_matrix(src).serialize()
+utils.write_data("../enc_data/enc_data", enc)

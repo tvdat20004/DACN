@@ -4,7 +4,7 @@ try:
 except:
     import numpy as np
     is_cupy_available = False
-
+# import numpy as np
 
 
 class LayerNormalization():
@@ -19,7 +19,7 @@ class LayerNormalization():
     """
 
     def __init__(self, normalized_shape = None, epsilon = 0.001, data_type = np.float32):
-        
+
         self.normalized_shape = normalized_shape
         self.normalized_axis = None
         self.epsilon  = epsilon
@@ -36,10 +36,12 @@ class LayerNormalization():
         self.axis = None
 
         self.build()
-    
-    def set_optimizer(self, optimizer):
-        self.optimizer = optimizer
-    
+
+    # def set_optimizer(self, optimizer):
+    #     self.optimizer = optimizer
+    def set_encrypted_weights(self, enc_weights):
+        assert len(enc_weights) == 4
+        self.gamma, self.beta, self.vg, self.mg, self.vg_hat, self.mg_hat, self.vb, self.mb, self.vb_hat, self.mb_hat = enc_weights
 
     def build(self):
         self.feature_size = None
@@ -54,7 +56,7 @@ class LayerNormalization():
 
             self.vb, self.mb         = np.zeros_like(self.gamma).astype(self.data_type), np.zeros_like(self.gamma).astype(self.data_type)
             self.vb_hat, self.mb_hat = np.zeros_like(self.gamma).astype(self.data_type), np.zeros_like(self.gamma).astype(self.data_type)
-        
+
 
 
     def forward(self, X):
@@ -65,25 +67,25 @@ class LayerNormalization():
             self.normalized_shape = self.input_data.shape[1:]
 
             self.build()
-  
+
         self.normalized_axis = tuple(np.arange(self.input_data.ndim - self.gamma.ndim).tolist())
         self.feature_size = self.gamma.size
-        
+
         self.mean = np.mean(x_T, axis = 0)
         self.var = np.var(x_T,axis = 0)
-        
-    
+
+
         self.X_centered = (x_T - self.mean)
         self.stddev_inv = 1 / np.sqrt(self.var + self.epsilon)
 
         self.X_hat_T = self.X_centered * self.stddev_inv
         self.X_hat = self.X_hat_T.T
-        
+
         self.output_data = self.gamma * self.X_hat + self.beta
 
         return self.output_data
 
-        
+
 
     def backward(self, error):
         error_T = error.T
@@ -114,10 +116,10 @@ class LayerNormalization():
 
         output_error = output_error.T
 
-        
+
         self.grad_gamma = np.sum(error * self.X_hat, axis = self.normalized_axis)
         self.grad_beta = np.sum(error, axis = self.normalized_axis)
-        
+
         return output_error
 
     def update_weights(self, layer_num):
@@ -125,7 +127,7 @@ class LayerNormalization():
         self.beta, self.vb, self.mb, self.vb_hat, self.mb_hat = self.optimizer.update(self.grad_beta, self.beta, self.vb, self.mb, self.vb_hat, self.mb_hat, layer_num)
 
         return layer_num + 1
-        
+
     def get_grads(self):
         return self.grad_gamma, self.grad_beta
 

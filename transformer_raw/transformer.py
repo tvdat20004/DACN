@@ -11,7 +11,7 @@ try:
 except:
     is_cupy_available = False
     print('CuPy is not available. Switching to NumPy.')
-
+# is_cupy_available = False
 import pickle as pkl
 from tqdm import tqdm
 from transformer_raw.modules import Encoder
@@ -284,7 +284,7 @@ decoder = Decoder(OUTPUT_DIM, DEC_HEADS, DEC_LAYERS, HID_DIM, FF_SIZE, DEC_DROPO
 model = Seq2Seq(encoder, decoder, PAD_INDEX)
 
 try:
-    model.load("saved models/seq2seq_model/10")
+    model.load("saved_models/seq2seq_model/10")
 except:
     print("Can't load saved model state")
 
@@ -298,7 +298,7 @@ model.compile(
                 , loss_function = CrossEntropy(ignore_index=PAD_INDEX)
             )
 train_loss_history, val_loss_history = None, None
-# train_loss_history, val_loss_history = model.fit(train_data, val_data, epochs = 30, save_every_epochs = 5, save_path = "saved models/seq2seq_model", validation_check = True)# "saved models/seq2seq_model"
+# train_loss_history, val_loss_history = model.fit(train_data, val_data, epochs = 30, save_every_epochs = 5, save_path = "../saved_models/seq2seq_model", validation_check = True)# "saved models/seq2seq_model"
 
 
 def plot_loss_history(train_loss_history, val_loss_history):

@@ -9,7 +9,7 @@ from embedding import Embedding
 from positional_encoding import PositionalEncoding
 from prepare_data import DataPreparator
 import tenseal as ts
-from client_side import utils
+from client_side.utils import Utils
 
 # Get data
 DATA_TYPE = np.float32

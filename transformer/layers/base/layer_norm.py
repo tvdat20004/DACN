@@ -36,9 +36,9 @@ class LayerNormalization():
         self.axis = None
 
         self.build()
-
-    def set_optimizer(self, optimizer):
-        self.optimizer = optimizer
+    def 
+    # def set_optimizer(self, optimizer):
+    #     self.optimizer = optimizer
 
 
     def build(self) -> None:

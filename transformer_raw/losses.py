@@ -4,7 +4,7 @@ try:
 except:
     import numpy as np
     is_cupy_available = False
-
+# import numpy as np
 from transformer_raw.activations import Sigmoid, Softmax, ReLU, LogSoftmax
 
 

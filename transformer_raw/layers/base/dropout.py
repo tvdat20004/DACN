@@ -5,7 +5,7 @@ except:
     import numpy as np
     is_cupy_available = False
 
-
+# import numpy as np
 
 class Dropout():
     """

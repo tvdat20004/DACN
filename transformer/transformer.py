@@ -319,9 +319,7 @@ train_loss_history, val_loss_history = None, None
 #     plot_loss_history(train_loss_history, val_loss_history)
 data_path = "../enc_data/enc_data"
 enc = utils.read_data(data_path)
-print(00000000)
 enc_tensor = ts.ckks_tensor_from(utils.context, enc)
-print('ccccccc')
 response = model.predict(enc_tensor)
 
 

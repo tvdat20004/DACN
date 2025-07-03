@@ -4,7 +4,7 @@ try:
 except:
     import numpy as np
     is_cupy_available = False
-
+# import numpy as np
 
 
 class Dense():
@@ -23,7 +23,7 @@ class Dense():
         self.units_num   = units_num
         self.inputs_num = inputs_num
         self.use_bias    = use_bias
-        
+
         self.w = None
         self.b = None
 
@@ -49,11 +49,11 @@ class Dense():
         # else:
         #     self.b = np.zeros(self.units_num)
         self.b = np.zeros(self.units_num).astype(self.data_type)
-        
+
 
         #glorot initialization
         # self.w = np.random.uniform(-np.sqrt(6 / (self.input_size + self.units_num)), np.sqrt(6 / (self.input_size + self.units_num)), (self.input_size, self.units_num))
-        
+
 
         self.v, self.m         = np.zeros_like(self.w).astype(self.data_type), np.zeros_like(self.w).astype(self.data_type) # optimizers params
         self.v_hat, self.m_hat = np.zeros_like(self.w).astype(self.data_type), np.zeros_like(self.w).astype(self.data_type) # optimizers params
@@ -63,13 +63,14 @@ class Dense():
 
         self.output_shape = (1, self.units_num)
 
-    def forward(self, X, training = True): 
+    def forward(self, X, training = True):
         self.input_data = X
-       
+        assert X.shape[0] == 1
+
         self.batch_size = len(self.input_data)
 
         self.output_data = np.dot(self.input_data, self.w) + self.b
-        
+        # print(self.input_data.shape, self.w.shape, self.b.shape, self.output_data.shape)
         return self.output_data
 
     def backward(self, error):
@@ -84,7 +85,7 @@ class Dense():
         self.w, self.v, self.m, self.v_hat, self.m_hat  = self.optimizer.update(self.grad_w, self.w, self.v, self.m, self.v_hat, self.m_hat, layer_num)
         if self.use_bias == True:
             self.b, self.vb, self.mb, self.vb_hat, self.mb_hat  = self.optimizer.update(self.grad_b, self.b, self.vb, self.mb, self.vb_hat, self.mb_hat, layer_num)
-        
+
         return layer_num + 1
 
     def get_grads(self):
@@ -92,4 +93,3 @@ class Dense():
 
     def set_grads(self, grads):
         self.grad_w, self.grad_b = grads
-        
