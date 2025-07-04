@@ -4,16 +4,16 @@ def context() -> ts.Context:
     context = ts.context(
         ts.SCHEME_TYPE.CKKS,
         poly_modulus_degree = 8192,
-        coeff_mod_bit_sizes=[60, 40, 40, 60]
+        coeff_mod_bit_sizes = [31, 26,26 ,26 ,26 ,26 ,26 ,31]
     )
     context.generate_galois_keys()
-    context.global_scale = pow(2, 40)
+    context.global_scale = pow(2, 26)
     return context
 def parallel_context(n_threads : int) -> ts.Context:
     context = ts.context(
-        ts.SCHEME_TYPE.CKKS, 8192, coeff_mod_bit_sizes=[60, 40, 40, 60], n_threads=n_threads
+        ts.SCHEME_TYPE.CKKS, 8192, coeff_mod_bit_sizes=[31, 26,26 ,26 ,26 ,26 ,26 ,31], n_threads=n_threads
     )
-    context.global_scale = pow(2, 40)
+    context.global_scale = pow(2, 26)
     context.generate_galois_keys()
     return context
 

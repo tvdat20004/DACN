@@ -56,7 +56,34 @@ class Utils:
         else:
             return Utils._dot_2d(tensor1, tensor2)
     @staticmethod
-    def mean(X : ts.CKKSTensor, )
+    def mean(X : ts.CKKSTensor, axis : int = 0) -> ts.CKKSTensor:
+        """
+        Calculate the mean of a CKKSTensor along a specified axis.
+        """
+        return X.sum(axis=axis) * (1 / X.shape[axis])
+    @staticmethod
+    def var(X: ts.CKKSTensor, axis: int = 0) -> ts.CKKSTensor:
+        n = X.shape[axis]
+        if n == 0:
+            raise ValueError(f"Kích thước của trục {axis} không thể bằng 0.")
+        mean_ax = X.sum(axis=axis) * (1 / n)
+        # print(f"mean_ax: {mean_ax}")
+        mean_X_squared = mean_ax ** 2
+        squared_X = X ** 2
+        mean_of_squared_X = squared_X.sum(axis=axis) * (1 / n)
+        variance = mean_of_squared_X - mean_X_squared
+        return variance
+    @staticmethod
+    def sqrt(X: ts.CKKSTensor, mean : float = 1.0) -> ts.CKKSTensor:
+        # Approximating Square Roots with Taylor Series
+        def fx(x):
+            return pow(x, 1/2)
+        def fx_(x):
+            return 1/2 * pow(x, -1/2)
+        def fx__(x):
+            return -1/4 * pow(x, -3/2)
+        return fx(mean) + fx_(mean) * (X - mean) + 1/2 * fx__(mean) * (X - mean) ** 2
+
     @staticmethod
     def write_data(filename : str, data : bytes):
         with open(filename, 'wb') as file:
