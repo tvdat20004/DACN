@@ -6,7 +6,7 @@ except:
     is_cupy_available = False
 from typing import Optional, List
 import tenseal as ts
-from client_side.utils import Utils
+from transformer.utils import Utils
 
 class LayerNormalization():
     """
@@ -41,7 +41,8 @@ class LayerNormalization():
     # def set_optimizer(self, optimizer):
     #     self.optimizer = optimizer
     def set_encrypted_weights(self, enc_weights : List[ts.CKKSTensor]) -> None:
-        self.var, self.gamma,
+        assert len(enc_weights) == 2
+        self.gamma, self.beta = enc_weights
 
     # def build(self) -> None:
 
@@ -68,17 +69,16 @@ class LayerNormalization():
         #     self.build()
 
         self.normalized_axis = tuple(np.arange(Utils.ndim(self.input_data) - Utils.ndim(self.gamma)).tolist())
-        self.feature_size = self.gamma.size
+        self.feature_size = self.gamma.shape[0]
 
-        self.mean = np.mean(x_T, axis = 0)
-        self.var = np.var(x_T,axis = 0)
-
+        self.mean = Utils.mean(x_T, axis = 0)
+        self.var = Utils.var(x_T,axis = 0)
 
         self.X_centered = (x_T - self.mean)
-        self.stddev_inv = 1 / np.sqrt(self.var + self.epsilon)
+        self.stddev_inv = Utils.x_power_n(self.var + self.epsilon, -0.5, mean = 1.0)
 
         self.X_hat_T = self.X_centered * self.stddev_inv
-        self.X_hat = self.X_hat_T.T
+        self.X_hat = self.X_hat_T.transpose()
 
         self.output_data = self.gamma * self.X_hat + self.beta
 

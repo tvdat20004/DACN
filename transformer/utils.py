@@ -74,15 +74,19 @@ class Utils:
         variance = mean_of_squared_X - mean_X_squared
         return variance
     @staticmethod
-    def sqrt(X: ts.CKKSTensor, mean : float = 1.0) -> ts.CKKSTensor:
+    def x_power_n(X: ts.CKKSTensor, n : Union[int, float] , mean : float = None) -> ts.CKKSTensor:
         # Approximating Square Roots with Taylor Series
-        def fx(x):
-            return pow(x, 1/2)
-        def fx_(x):
-            return 1/2 * pow(x, -1/2)
-        def fx__(x):
-            return -1/4 * pow(x, -3/2)
-        return fx(mean) + fx_(mean) * (X - mean) + 1/2 * fx__(mean) * (X - mean) ** 2
+        if type(n) is int and n > 0:
+            return X ** n
+        else:
+            assert mean is not None, "Mean must be provided for non-integer powers"
+            def fx(x : float) -> float:
+                return pow(x, n)
+            def fx_(x : float) -> float:
+                return n * pow(x, n - 1)
+            def fx__(x : float) -> float:
+                return n*(n-1) * pow(x, n-2)
+            return fx(mean) + fx_(mean) * (X - mean) + 1/2 * fx__(mean) * (X - mean) ** 2
 
     @staticmethod
     def write_data(filename : str, data : bytes):
