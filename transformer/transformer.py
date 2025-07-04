@@ -234,13 +234,13 @@ class Seq2Seq():
 
 # def(predict(self, ckks_tensor, max_length)))
 
-    def predict(self,enc_tensor : ts.CKKSTensor, max_length : int = 50):
+    def predict(self, enc_tensor : ts.CKKSTensor, src_mask : np.array, max_length : int = 50):
 
-        src_inds = [vocabs[0][word] if word in vocabs[0] else UNK_INDEX for word in sentence]
-        src_inds = [SOS_INDEX] + src_inds + [EOS_INDEX]
+        # src_inds = [vocabs[0][word] if word in vocabs[0] else UNK_INDEX for word in sentence]
+        # src_inds = [SOS_INDEX] + src_inds + [EOS_INDEX]
 
-        src = np.asarray(src_inds).reshape(1, -1)
-        src_mask =  self.get_pad_mask(src)
+        # src = np.asarray(src_inds).reshape(1, -1)
+        # src_mask =  self.get_pad_mask(src)
         # print(src_mask, type(src_mask))
 
         enc_src = self.encoder.forward(enc_tensor)
@@ -258,11 +258,13 @@ class Seq2Seq():
 
             if trg_indx == EOS_INDEX or len(trg_inds) >= max_length:
                 break
+        
+        enc_trg_inds = trg_inds
+        return enc_trg_inds
+        # reversed_vocab = dict((v,k) for k,v in vocabs[1].items())
+        # decoded_sentence = [reversed_vocab[indx] if indx in reversed_vocab else UNK_TOKEN for indx in trg_inds]
 
-        reversed_vocab = dict((v,k) for k,v in vocabs[1].items())
-        decoded_sentence = [reversed_vocab[indx] if indx in reversed_vocab else UNK_TOKEN for indx in trg_inds]
-
-        return decoded_sentence[1:], attention[0]
+        # return decoded_sentence[1:], attention[0]
 
 
 

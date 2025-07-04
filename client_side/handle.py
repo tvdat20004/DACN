@@ -59,15 +59,26 @@ position_embedding = PositionalEncoding(5000, HID_DIM, ENC_DROPOUT, np.float32)
 dropout = Dropout(ENC_DROPOUT, np.float32)
 scale = np.sqrt(HID_DIM).astype(np.float32)
 
-idx = 0 # Choose random index
-vocabs = train_data_vocabs
-sentence = val_data[idx]['en']
-src_inds = [vocabs[0][word] if word in vocabs[0] else UNK_INDEX for word in sentence]
-src_inds = [SOS_INDEX] + src_inds + [EOS_INDEX]
-src = np.asarray(src_inds).reshape(1, -1)
-src = token_embedding.forward(src) * scale
-src = position_embedding.forward(src)
-src = dropout.forward(src, training = False)[0]
-utils = Utils("../keys")
-enc = utils.encrypt_matrix(src).serialize()
-utils.write_data("../enc_data/enc_data", enc)
+def encrypt_data(idx, train_data_vocabs):
+    vocabs = train_data_vocabs
+    sentence = val_data[idx]['en']
+    src_inds = [vocabs[0][word] if word in vocabs[0] else UNK_INDEX for word in sentence]
+    src_inds = [SOS_INDEX] + src_inds + [EOS_INDEX]
+    src = np.asarray(src_inds).reshape(1, -1)
+    src_mask = (src != PAD_INDEX).astype(int)[:, np.newaxis, :]
+
+    src = token_embedding.forward(src) * scale
+    src = position_embedding.forward(src)
+    src = dropout.forward(src, training = False)[0]
+    utils = Utils("../keys")
+    enc = utils.encrypt_matrix(src).serialize()
+    utils.write_data("../enc_data/enc_data", enc)
+    utils.write_data("../enc_data/src_mask", src_mask.tobyte())
+
+def decrypt_data(enc_trg_inds, train_data_vocabs):
+    vocabs = train_data_vocabs
+    reversed_vocab = dict((v,k) for k,v in vocabs[1].items())
+    utils = Utils("../keys")
+    trg_inds = utils.decrypt_matrix(enc_trg_inds).astype(int)
+    decoded_sentence = [reversed_vocab[indx] if indx in reversed_vocab else UNK_TOKEN for indx in trg_inds]
+    print(" ".join(decoded_sentence))
