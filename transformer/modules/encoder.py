@@ -26,14 +26,14 @@ class Encoder:
         # self.dropout = Dropout(dropout, data_type)
         # self.scale = np.sqrt(d_model).astype(data_type)
 
-    def forward(self, src : ts.CKKSTensor):
+    def forward(self, src : ts.CKKSTensor, src_mask : np.ndarray):
 
         # src = self.token_embedding.forward(src) * self.scale
         # src = self.position_embedding.forward(src)
         # src = self.dropout.forward(src, training)
         # //////
         for layer in self.layers:
-            src = layer.forward(src, None)
+            src = layer.forward(src, src_mask)
 
         return src
 

@@ -22,7 +22,7 @@ class EncoderLayer:
 
         self.dropout = Dropout(dropout, data_type)
 
-    def forward(self, src : ts.CKKSTensor, src_mask : ts.CKKSTensor):
+    def forward(self, src : ts.CKKSTensor, src_mask : np.ndarray):
         _src, _ = self.self_attention.forward(src, src, src, src_mask)
         src = self.self_attention_norm.forward(src + self.dropout.forward(_src))
 
@@ -47,10 +47,10 @@ class EncoderLayer:
     #     self.self_attention.set_optimizer(optimizer)
     #     self.position_wise_feed_forward.set_optimizer(optimizer)
 
-    def update_weights(self, layer_num):
-        layer_num = self.self_attention_norm.update_weights(layer_num)
-        layer_num = self.ff_layer_norm.update_weights(layer_num)
-        layer_num = self.self_attention.update_weights(layer_num)
-        layer_num = self.position_wise_feed_forward.update_weights(layer_num)
+    # def update_weights(self, layer_num):
+    #     layer_num = self.self_attention_norm.update_weights(layer_num)
+    #     layer_num = self.ff_layer_norm.update_weights(layer_num)
+    #     layer_num = self.self_attention.update_weights(layer_num)
+    #     layer_num = self.position_wise_feed_forward.update_weights(layer_num)
 
-        return layer_num
+    #     return layer_num

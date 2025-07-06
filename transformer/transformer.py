@@ -22,7 +22,7 @@ from transformer.losses import CrossEntropy
 from transformer.prepare_data import DataPreparator
 import matplotlib.pyplot as plt
 from typing import List, Tuple, Dict, Optional
-from transformer import utils
+from transformer.utils import Utils
 
 unsplited_mapping = Dict[str, str]
 splited_mapping = Dict[str, List[str]]
@@ -243,7 +243,7 @@ class Seq2Seq():
         # src_mask =  self.get_pad_mask(src)
         # print(src_mask, type(src_mask))
 
-        enc_src = self.encoder.forward(enc_tensor)
+        enc_src = self.encoder.forward(enc_tensor, src_mask)
 
         trg_inds = [SOS_INDEX]
 
@@ -258,7 +258,7 @@ class Seq2Seq():
 
             if trg_indx == EOS_INDEX or len(trg_inds) >= max_length:
                 break
-        
+
         enc_trg_inds = trg_inds
         return enc_trg_inds
         # reversed_vocab = dict((v,k) for k,v in vocabs[1].items())
@@ -319,10 +319,15 @@ train_loss_history, val_loss_history = None, None
 
 # if train_loss_history is not None and val_loss_history is not None:
 #     plot_loss_history(train_loss_history, val_loss_history)
-data_path = "../enc_data/enc_data"
-enc = utils.read_data(data_path)
-enc_tensor = ts.ckks_tensor_from(utils.context, enc)
-response = model.predict(enc_tensor)
+utils = Utils("../keys")
+data_path = "../enc_data"
+
+enc = Utils.read_data(f'{data_path}/enc_data')
+mask = Utils.read_data(f'{data_path}/enc_mask')
+
+enc_tensor = ts.ckks_tensor_from(utils.public_context, enc)
+mask = np.frombuffer(mask, dtype=int)
+response = model.predict(enc_tensor, mask)
 
 
 

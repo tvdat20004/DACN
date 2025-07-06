@@ -121,14 +121,14 @@ class LayerNormalization():
 
         return output_error
 
-    def update_weights(self, layer_num):
-        self.gamma, self.vg, self.mg, self.vg_hat, self.mg_hat  = self.optimizer.update(self.grad_gamma, self.gamma, self.vg, self.mg, self.vg_hat, self.mg_hat, layer_num)
-        self.beta, self.vb, self.mb, self.vb_hat, self.mb_hat = self.optimizer.update(self.grad_beta, self.beta, self.vb, self.mb, self.vb_hat, self.mb_hat, layer_num)
+    # def update_weights(self, layer_num):
+    #     self.gamma, self.vg, self.mg, self.vg_hat, self.mg_hat  = self.optimizer.update(self.grad_gamma, self.gamma, self.vg, self.mg, self.vg_hat, self.mg_hat, layer_num)
+    #     self.beta, self.vb, self.mb, self.vb_hat, self.mb_hat = self.optimizer.update(self.grad_beta, self.beta, self.vb, self.mb, self.vb_hat, self.mb_hat, layer_num)
 
-        return layer_num + 1
+    #     return layer_num + 1
 
-    def get_grads(self):
-        return self.grad_gamma, self.grad_beta
+    # def get_grads(self):
+    #     return self.grad_gamma, self.grad_beta
 
-    def set_grads(self, grads):
-        self.grad_gamma, self.grad_beta = grads
+    # def set_grads(self, grads):
+    #     self.grad_gamma, self.grad_beta = grads

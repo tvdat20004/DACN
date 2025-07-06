@@ -8,9 +8,9 @@ except:
 from transformer.layers.base.dense import Dense
 from transformer.layers.base.dropout import Dropout
 from transformer.activations import Sigmoid, Softmax
-from typing import Optional
+from typing import Optional, Union, List
 import tenseal as ts
-
+from transformer.utils import Utils
 class MultiHeadAttention:
     """Multi-HeadAttention"""
     def __init__(self, d_model : int = 512, heads_num : int = 8, dropout : float = 0.1, data_type : Optional[type] = None) -> None:
@@ -31,11 +31,15 @@ class MultiHeadAttention:
 
         self.dropout = Dropout(dropout)
 
-    def split_heads_forward(self, x : ts.CKKSTensor):
-        batch_size = x.shape[0]
-
-        return x.reshape([batch_size, -1, self.heads_num, self.d_k]).transpose(0, 2, 1, 3)
-
+    def split_heads_forward(self, x : Union[List[ts.CKKSTensor], ts.CKKSTensor]) -> ts.CKKSTensor:
+        batch_size = Utils.shape(x)[0]
+        try:
+            return x.reshape([batch_size, -1, self.heads_num, self.d_k]).transpose(0, 2, 1, 3)
+        except:
+            res = []
+            assert isinstance(x, list), "x must be a CKKSTensor or a list of CKKSTensors"
+            for tensor in x:
+                res.append(tensor.reshape([-1, self.heads_num, self.d_k]))
     def split_heads_backward(self, x):
         batch_size = x.shape[0]
         #x.transpose(0, 2, 1, 3).reshape(batch_size, self.key_len, self.d_model)
@@ -52,7 +56,7 @@ class MultiHeadAttention:
         return x.reshape(batch_size, -1, self.heads_num, self.d_k).transpose(0, 2, 1, 3)
 
 
-    def forward(self, query : ts.CKKSTensor, key : ts.CKKSTensor, value : ts.CKKSTensor, mask : ts.CKKSTensor):
+    def forward(self, query : ts.CKKSTensor, key : ts.CKKSTensor, value : ts.CKKSTensor, mask : np.ndarray):
 
         self.key_len, self.query_len, self.value_len = key.shape[1], query.shape[1], value.shape[1]
 

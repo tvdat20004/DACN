@@ -8,13 +8,24 @@ except:
     is_cupy_available = False
 from typing import List, Union
 class Utils:
-    def __init__(self, keys_folder_path : str):
+    def __init__(self, keys_folder_path : str, has_secret_key : bool = False):
         self.public_context = ts.context_from(Utils.read_data(f"{keys_folder_path}/public.txt"))
-        self.secret_context = ts.context_from(Utils.read_data(f"{keys_folder_path}/secret.txt"))
-        self.secret_key = self.secret_context.secret_key()
+        self.has_secret_key = has_secret_key
+        if has_secret_key:
+            self.secret_context = ts.context_from(Utils.read_data(f"{keys_folder_path}/secret.txt"))
+            self.secret_key = self.secret_context.secret_key()
+
     @staticmethod
-    def ndim(X : ts.CKKSTensor) -> int:
-        return len(X.shape)
+    def ndim(X : Union[List[ts.CKKSTensor], ts.CKKSTensor]) -> int:
+        return len(Utils.shape(X))
+    @staticmethod
+    def shape(X : Union[List[ts.CKKSTensor], ts.CKKSTensor]) -> List[int]:
+        try:
+            return list(X.shape)
+        except:
+            assert isinstance(X, list), "X must be a CKKSTensor or a list of CKKSTensors"
+            batch_size = len(X)
+            return [batch_size] + list(X[0].shape)
     @staticmethod
     def add(tensor1: Union[ts.CKKSTensor, List[ts.CKKSTensor]], tensor2: ts.CKKSTensor) -> Union[List[ts.CKKSTensor], ts.CKKSTensor]:
         if isinstance(tensor1, list):
@@ -75,7 +86,7 @@ class Utils:
         return variance
     @staticmethod
     def x_power_n(X: ts.CKKSTensor, n : Union[int, float] , mean : float = None) -> ts.CKKSTensor:
-        # Approximating Square Roots with Taylor Series
+        # Approximating x ** n with Taylor Series
         if type(n) is int and n > 0:
             return X ** n
         else:
@@ -121,4 +132,5 @@ class Utils:
     def encrypt_matrix(self, matrix : np.ndarray) -> ts.CKKSTensor:
         return ts.ckks_tensor(self.public_context, matrix.tolist())
     def decrypt_matrix(self, encrypted_matrix : ts.CKKSTensor) -> np.ndarray:
+        assert self.has_secret_key, "You don't have secret keys."
         return np.array(encrypted_matrix.decrypt(self.secret_key).tolist(), dtype=np.float32)

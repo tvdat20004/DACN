@@ -82,3 +82,5 @@ def decrypt_data(enc_trg_inds, train_data_vocabs):
     trg_inds = utils.decrypt_matrix(enc_trg_inds).astype(int)
     decoded_sentence = [reversed_vocab[indx] if indx in reversed_vocab else UNK_TOKEN for indx in trg_inds]
     print(" ".join(decoded_sentence))
+
+print(val_data[0]['en'])
